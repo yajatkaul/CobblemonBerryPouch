@@ -1,5 +1,6 @@
 package com.github.flandre923.berrypouch.mixins.client;
 
+import com.github.flandre923.berrypouch.client.renderer.PokeBallGunRenderHelper;
 import com.github.flandre923.berrypouch.item.PokeBallGun;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
@@ -7,6 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +36,9 @@ public class ItemInHandRendererMixin {
             MultiBufferSource multiBufferSource,
             int light
     ){}
+    
+    @Shadow
+    private ItemRenderer itemRenderer;
     /**
      * 阻止 PokeBallGun 的挥手动画
      * 当玩家持有 PokeBallGun 且没有按 Shift 时，直接返回不执行挥手动画
@@ -99,6 +104,11 @@ public class ItemInHandRendererMixin {
                     poseStack,
                     multiBufferSource,
                     combinedLight
+            );
+            
+            // 7. 动态渲染精灵球
+            PokeBallGunRenderHelper.renderPokeBallOnGun(
+                itemStack, poseStack, multiBufferSource, combinedLight, this.itemRenderer
             );
 
             poseStack.popPose();

@@ -10,7 +10,8 @@
     "EnableAutoFillMixin"
   ],
   "client": [
-    "client.ItemInHandRendererMixin"
+    "client.ItemInHandRendererMixin",
+    "client.ItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
