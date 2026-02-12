@@ -47,11 +47,7 @@ public class PokeBallGunRenderHelper {
     }
 
     private static void applyBallTransform(ItemDisplayContext displayContext, PoseStack poseStack) {
-        PokeBallGunTransformSettings.Transform transform =
-                displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
-                        || displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                        ? PokeBallGunTransformSettings.getFirstPerson()
-                        : PokeBallGunTransformSettings.getOther();
+        PokeBallGunTransformSettings.Transform transform = getTransform(displayContext);
 
         poseStack.translate(transform.translateX, transform.translateY, transform.translateZ);
         if (transform.rotateX != 0F) {
@@ -69,5 +65,21 @@ public class PokeBallGunRenderHelper {
         if (baseRotationY != 0F) {
             poseStack.mulPose(Axis.YP.rotationDegrees(baseRotationY));
         }
+    }
+
+    private static PokeBallGunTransformSettings.Transform getTransform(ItemDisplayContext displayContext) {
+        PokeBallGunTransformSettings.Transform transform = PokeBallGunTransformSettings.getOther();
+
+        if(displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+        || displayContext ==  ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+        || displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
+        || displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+            transform  = PokeBallGunTransformSettings.getFirstPerson();
+        }else if(displayContext == ItemDisplayContext.GUI){
+            transform = PokeBallGunTransformSettings.getGUI();
+        }else if(displayContext == ItemDisplayContext.GROUND){
+            transform =  PokeBallGunTransformSettings.getGroud();
+        }
+        return transform;
     }
 }

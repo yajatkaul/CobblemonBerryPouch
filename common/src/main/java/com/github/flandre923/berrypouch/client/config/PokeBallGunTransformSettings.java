@@ -15,11 +15,25 @@ import java.nio.file.Path;
 public final class PokeBallGunTransformSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final float DEFAULT_BASE_ROTATION_Y = 90F;
+
     private static final Transform DEFAULT_FIRST_PERSON = new Transform(
             0.2F, 0.35F, -0.25F,
             0F, 0F, 0F,
             0.4F, 0.4F, 0.4F
     );
+
+    private static final Transform DEFAULT_GROUND = new Transform(
+            0.2f,0.45f,-0.25f,
+            0f,0f,0f,
+            0.4f,0.4f,0.4f
+    );
+
+    private static final Transform DEFAULT_GUI = new Transform(
+            -0.6f,0.0f,0.0f,
+            0f,90f,0f,
+            0.8f,0.8f,0.8f
+    );
+
     private static final Transform DEFAULT_OTHER = new Transform(
             0F, 0F, 0F,
             0F, 45F, 0F,
@@ -28,6 +42,8 @@ public final class PokeBallGunTransformSettings {
 
     private static Transform firstPerson = DEFAULT_FIRST_PERSON.copy();
     private static Transform other = DEFAULT_OTHER.copy();
+    private static Transform gui =  DEFAULT_GUI.copy();
+    private static Transform ground = DEFAULT_GROUND.copy();
     private static float baseRotationY = DEFAULT_BASE_ROTATION_Y;
 
     private PokeBallGunTransformSettings() {
@@ -39,6 +55,14 @@ public final class PokeBallGunTransformSettings {
 
     public static Transform getOther() {
         return other;
+    }
+
+    public static Transform getGUI(){
+        return gui;
+    }
+
+    public static Transform getGroud(){
+        return ground;
     }
 
     public static float getBaseRotationY() {
