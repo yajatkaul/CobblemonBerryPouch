@@ -30,6 +30,10 @@ public abstract class ItemRendererMixin {
             return;
         }
 
+        if (displayContext == ItemDisplayContext.GUI) {
+            return;
+        }
+
         ItemStack selectedBall = PokeBallGunHelper.getSelectedItem(stack);
         if (selectedBall.isEmpty()) {
             return;
