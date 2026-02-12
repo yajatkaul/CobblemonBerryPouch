@@ -1,5 +1,6 @@
 package com.github.flandre923.berrypouch.client.screen;
 
+import com.github.flandre923.berrypouch.client.DevEnvironment;
 import com.github.flandre923.berrypouch.client.config.PokeBallGunTransformSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,6 +26,10 @@ public class PokeBallTransformScreen extends Screen {
 
     @Override
     protected void init() {
+        if (!DevEnvironment.IS_DEV) {
+            Minecraft.getInstance().setScreen(lastScreen);
+            return;
+        }
         bindings.clear();
         int centerX = this.width / 2;
         int leftColumnX = centerX - 150;

@@ -1,6 +1,7 @@
 package com.github.flandre923.berrypouch.client.input;
 
 import com.github.flandre923.berrypouch.ModCommon;
+import com.github.flandre923.berrypouch.client.DevEnvironment;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.KeyMapping;
@@ -45,10 +46,12 @@ public class KeyBindingManager {
                 new ToggleAutoBerryAction()
         );
 
-        registerKeyBinding(
-                new KeyMapping(KEY_OPEN_POKEBALL_TRANSFORM, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, KEY_CATEGORY),
-                new OpenPokeBallTransformEditorAction()
-        );
+        if (DevEnvironment.IS_DEV) {
+            registerKeyBinding(
+                    new KeyMapping(KEY_OPEN_POKEBALL_TRANSFORM, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, KEY_CATEGORY),
+                    new OpenPokeBallTransformEditorAction()
+            );
+        }
     }
 
     private static void registerKeyBinding(KeyMapping mapping, KeyAction action) {

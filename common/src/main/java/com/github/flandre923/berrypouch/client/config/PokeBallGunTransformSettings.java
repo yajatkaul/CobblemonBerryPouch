@@ -1,5 +1,6 @@
 package com.github.flandre923.berrypouch.client.config;
 
+import com.github.flandre923.berrypouch.client.DevEnvironment;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -74,6 +75,10 @@ public final class PokeBallGunTransformSettings {
     }
 
     public static void load() {
+        if (!DevEnvironment.IS_DEV) {
+            resetToDefaults();
+            return;
+        }
         Path configPath = getConfigPath();
         if (!Files.exists(configPath)) {
             save();
@@ -95,6 +100,9 @@ public final class PokeBallGunTransformSettings {
     }
 
     public static void save() {
+        if (!DevEnvironment.IS_DEV) {
+            return;
+        }
         Path configPath = getConfigPath();
         try {
             Files.createDirectories(configPath.getParent());
