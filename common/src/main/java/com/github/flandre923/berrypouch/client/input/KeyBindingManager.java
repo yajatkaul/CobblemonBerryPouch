@@ -18,6 +18,7 @@ public class KeyBindingManager {
     public static final String KEY_CYCLE_BAIT_LEFT = "key." + ModCommon.MOD_ID + ".cycle_bait_left";
     public static final String KEY_CYCLE_BAIT_RIGHT = "key." + ModCommon.MOD_ID + ".cycle_bait_right";
     public static final String KEY_TOGGLE_AUTO_BERRY = "key."+ModCommon.MOD_ID+".toggle_auto_berry";
+    public static final String KEY_OPEN_POKEBALL_TRANSFORM = "key." + ModCommon.MOD_ID + ".open_pokeball_transform";
 
     private static final Map<KeyMapping, KeyAction> KEY_ACTIONS = new HashMap<>();
 
@@ -42,6 +43,11 @@ public class KeyBindingManager {
         registerKeyBinding(
                 new KeyMapping(KEY_TOGGLE_AUTO_BERRY, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_BACKSLASH, KEY_CATEGORY),
                 new ToggleAutoBerryAction()
+        );
+
+        registerKeyBinding(
+                new KeyMapping(KEY_OPEN_POKEBALL_TRANSFORM, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_O, KEY_CATEGORY),
+                new OpenPokeBallTransformEditorAction()
         );
     }
 

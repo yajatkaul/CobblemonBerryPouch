@@ -1,64 +1,73 @@
 package com.github.flandre923.berrypouch.client.renderer;
 
-import com.cobblemon.mod.common.item.PokeBallItem;
-import com.github.flandre923.berrypouch.item.PokeBallGun;
-import com.github.flandre923.berrypouch.item.pouch.PokeBallGunHelper;
+import com.github.flandre923.berrypouch.client.config.PokeBallGunTransformSettings;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
-@Environment(EnvType.CLIENT)
 public class PokeBallGunRenderHelper {
-    
-    private static final float BALL_SCALE = 0.5f;
-    private static final float BALL_OFFSET_X = 0.0f;
-    private static final float BALL_OFFSET_Y = 0.0f;
-    private static final float BALL_OFFSET_Z = 0.3125f;
-    
-    public static boolean shouldRenderPokeBall(ItemStack stack) {
-        return !stack.isEmpty() && stack.getItem() instanceof PokeBallGun;
-    }
-    
-    public static ItemStack getSelectedPokeBall(ItemStack gunStack) {
-        if (!shouldRenderPokeBall(gunStack)) {
-            return ItemStack.EMPTY;
-        }
-        return PokeBallGunHelper.getSelectedItem(gunStack);
-    }
-    
-    public static void renderPokeBallOnGun(ItemStack gunStack, PoseStack poseStack, 
-                                           MultiBufferSource bufferSource, int packedLight,
-                                           ItemRenderer itemRenderer) {
-        ItemStack ballStack = getSelectedPokeBall(gunStack);
-        if (ballStack.isEmpty() || !(ballStack.getItem() instanceof PokeBallItem)) {
+
+    public static void renderPokeBallOnGun(
+            ItemStack selectedBall,
+            ItemDisplayContext displayContext,
+            PoseStack poseStack,
+            MultiBufferSource multiBufferSource,
+            int combinedLight,
+            int combinedOverlay,
+            ItemRenderer itemRenderer,
+            Level level,
+            int seed
+    ) {
+        if (selectedBall.isEmpty()) {
             return;
         }
-        
+
         poseStack.pushPose();
-        
-        poseStack.translate(BALL_OFFSET_X, BALL_OFFSET_Y, BALL_OFFSET_Z);
-        poseStack.scale(BALL_SCALE, BALL_SCALE, BALL_SCALE);
-        
-        BakedModel ballModel = itemRenderer.getModel(ballStack, null, null, 0);
-        
+        applyBallTransform(displayContext, poseStack);
+
+        BakedModel ballModel = itemRenderer.getModel(selectedBall, level, null, seed);
         itemRenderer.render(
-            ballStack, 
-            ItemDisplayContext.GUI, 
-            false, 
-            poseStack, 
-            bufferSource,
-            packedLight, 
-            OverlayTexture.NO_OVERLAY, 
-            ballModel
+                selectedBall,
+                ItemDisplayContext.NONE,
+                false,
+                poseStack,
+                multiBufferSource,
+                combinedLight,
+                combinedOverlay,
+                ballModel
         );
-        
+
         poseStack.popPose();
+    }
+
+    private static void applyBallTransform(ItemDisplayContext displayContext, PoseStack poseStack) {
+        PokeBallGunTransformSettings.Transform transform =
+                displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
+                        || displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                        ? PokeBallGunTransformSettings.getFirstPerson()
+                        : PokeBallGunTransformSettings.getOther();
+
+        poseStack.translate(transform.translateX, transform.translateY, transform.translateZ);
+        if (transform.rotateX != 0F) {
+            poseStack.mulPose(Axis.XP.rotationDegrees(transform.rotateX));
+        }
+        if (transform.rotateY != 0F) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(transform.rotateY));
+        }
+        if (transform.rotateZ != 0F) {
+            poseStack.mulPose(Axis.ZP.rotationDegrees(transform.rotateZ));
+        }
+        poseStack.scale(transform.scaleX, transform.scaleY, transform.scaleZ);
+
+        float baseRotationY = PokeBallGunTransformSettings.getBaseRotationY();
+        if (baseRotationY != 0F) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(baseRotationY));
+        }
     }
 }

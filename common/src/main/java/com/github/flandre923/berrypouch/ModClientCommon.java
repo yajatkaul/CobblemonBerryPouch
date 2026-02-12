@@ -1,6 +1,7 @@
 package com.github.flandre923.berrypouch;
 
 import com.github.flandre923.berrypouch.client.BerryPouchModelHelper;
+import com.github.flandre923.berrypouch.client.config.PokeBallGunTransformSettings;
 import com.github.flandre923.berrypouch.client.hud.BaitRenderHandler;
 import com.github.flandre923.berrypouch.client.input.KeyBindingManager;
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -11,6 +12,7 @@ import dev.architectury.event.events.client.ClientTickEvent;
 public class ModClientCommon {
 
     public static void init() {
+        PokeBallGunTransformSettings.load();
         ItemProperties.register(ModRegistries.Items.BERRY_POUCH_69.get(),
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "full"),
                 (stack, level, entity, seed) -> BerryPouchModelHelper.shouldUseFullModel(stack) ? 1.0F : 0.0F);

@@ -6,6 +6,7 @@
   "key.berrypouch.cycle_bait_left": "Switch Left",
   "key.berrypouch.cycle_bait_right": "Switch Right",
   "key.berrypouch.toggle_auto_berry": "Auto-equipped Bait",
+  "key.berrypouch.open_pokeball_transform": "Open Pokeball Transform Editor",
   "message.berrypouch.not_holding_rod": "You must holding a Cobblemon fishing rod.",
   "message.berrypouch.capability_missing": "Accessories system error",
   "message.berrypouch.need_pouch": "You need to equip a Berry Pouch",
@@ -23,6 +24,20 @@
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "Empty",
   "message.berrypouch.slot_empty": "Empty",
-  "container.berrypouch.pokeball_gun": "Pokéball Launcher"
+  "container.berrypouch.pokeball_gun": "Pokéball Launcher",
+  "screen.berrypouch.pokeball_transform.title": "Pokeball Transform",
+  "screen.berrypouch.pokeball_transform.first_person": "First Person",
+  "screen.berrypouch.pokeball_transform.other": "Other Views",
+  "screen.berrypouch.pokeball_transform.global": "Global",
+  "screen.berrypouch.pokeball_transform.translate_x": "T.X",
+  "screen.berrypouch.pokeball_transform.translate_y": "T.Y",
+  "screen.berrypouch.pokeball_transform.translate_z": "T.Z",
+  "screen.berrypouch.pokeball_transform.rotate_x": "R.X",
+  "screen.berrypouch.pokeball_transform.rotate_y": "R.Y",
+  "screen.berrypouch.pokeball_transform.rotate_z": "R.Z",
+  "screen.berrypouch.pokeball_transform.scale_x": "S.X",
+  "screen.berrypouch.pokeball_transform.scale_y": "S.Y",
+  "screen.berrypouch.pokeball_transform.scale_z": "S.Z",
+  "screen.berrypouch.pokeball_transform.base_rotate_y": "Base R.Y",
+  "screen.berrypouch.pokeball_transform.reset": "Reset"
 }
-
