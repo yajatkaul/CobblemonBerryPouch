@@ -25,7 +25,4 @@ public final class PokeBallGunLayout {
             .grid("player_inventory", DeclarativeStorageLayout.SlotRole.PLAYER_INVENTORY, 9, 8, 48, 9, 3, 18, 18)
             .grid("player_hotbar", DeclarativeStorageLayout.SlotRole.PLAYER_HOTBAR, 0, 8, 106, 9, 1, 18, 18)
             .build();
-
-    public static final DeclarativeStorageLayout.SlotVisualSpec SELECTION_VISUAL =
-            new DeclarativeStorageLayout.SlotVisualSpec(GUI_TEXTURE, 191, 15, 18, 18, 223, 129, -1, -1, 200);
 }

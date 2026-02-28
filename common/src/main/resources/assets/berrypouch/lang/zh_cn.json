@@ -24,5 +24,6 @@
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "空",
   "message.berrypouch.slot_empty": "空",
-  "container.berrypouch.pokeball_gun": "精灵球发射器"
+  "container.berrypouch.pokeball_gun": "精灵球发射器",
+  "container.berrypouch.fruit_basket": "水果篮"
 }

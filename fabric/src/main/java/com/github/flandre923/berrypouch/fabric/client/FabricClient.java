@@ -20,6 +20,7 @@ package com.github.flandre923.berrypouch.fabric.client;
 import com.github.flandre923.berrypouch.ModClientCommon;
 import com.github.flandre923.berrypouch.ModRegistries;
 import com.github.flandre923.berrypouch.client.input.KeyBindingManager;
+import com.github.flandre923.berrypouch.menu.screen.FruitBasketScreen;
 import com.github.flandre923.berrypouch.menu.screen.LargeBerryPouchScreen;
 import com.github.flandre923.berrypouch.menu.screen.PokeBallGunScreen;
 import net.fabricmc.api.ClientModInitializer;
@@ -33,6 +34,7 @@ public class FabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         MenuScreens.register(ModRegistries.ModMenuTypes.POKEBALL_GUN_MENU.get(), PokeBallGunScreen::new);
         MenuScreens.register(ModRegistries.ModMenuTypes.BERRY_POUCH_CONTAINER_69.get(), LargeBerryPouchScreen::new);
+        MenuScreens.register(ModRegistries.ModMenuTypes.FRUIT_BASKET_MENU.get(), FruitBasketScreen::new);
         KeyBindingManager.register();
         ModClientCommon.init();
 

@@ -24,6 +24,6 @@
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "Empty",
   "message.berrypouch.slot_empty": "Empty",
-  "container.berrypouch.pokeball_gun": "Pokéball Launcher"
+  "container.berrypouch.pokeball_gun": "Pokéball Launcher",
+  "container.berrypouch.fruit_basket": "Fruit Basket"
 }
-

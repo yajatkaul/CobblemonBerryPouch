@@ -10,7 +10,7 @@ public final class LargeBerryPouchLayout {
     }
 
     private static final ResourceLocation BACKGROUND_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/background.png");
+            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/berry_bag.png");
     private static final ResourceLocation SLOT_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/slot.png");
 
