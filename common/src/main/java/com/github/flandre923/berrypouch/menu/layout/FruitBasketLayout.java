@@ -9,7 +9,7 @@ public final class FruitBasketLayout {
     }
 
     public static final int WIDTH = 190;
-    public static final int HEIGHT = 180;
+    public static final int HEIGHT = 185;
 
     private static final ResourceLocation BACKGROUND_TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/background.png");
