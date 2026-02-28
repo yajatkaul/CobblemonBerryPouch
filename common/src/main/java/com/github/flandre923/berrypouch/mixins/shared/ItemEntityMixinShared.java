@@ -1,6 +1,7 @@
 package com.github.flandre923.berrypouch.mixins.shared;
 
 import com.github.flandre923.berrypouch.item.BerryPouch;
+import com.github.flandre923.berrypouch.item.FruitBasketItem;
 import com.github.flandre923.berrypouch.item.PokeBallGun;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,6 +15,9 @@ public final class ItemEntityMixinShared {
     public static boolean shouldCancelPickup(ItemEntity self, Player player, int pickupDelay, UUID thrower) {
         if (!player.level().isClientSide && pickupDelay == 0 && (thrower == null || thrower.equals(player.getUUID()))) {
             if (BerryPouch.onPickupItem(self, player)) {
+                return true;
+            }
+            if (FruitBasketItem.onPickupItem(self, player)) {
                 return true;
             }
             if (PokeBallGun.onPickupItem(self, player)) {

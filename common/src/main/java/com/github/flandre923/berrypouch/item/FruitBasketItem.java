@@ -22,6 +22,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -100,6 +101,65 @@ public class FruitBasketItem extends Item {
 
     public long getStoredCount(ItemStack basket, Item item) {
         return FruitBasketStorage.get(basket, item);
+    }
+
+    public static boolean onPickupItem(ItemEntity itemEntity, Player player) {
+        ItemStack itemStack = itemEntity.getItem();
+        if (itemStack.isEmpty() || !isApricornItem(itemStack)) {
+            return false;
+        }
+
+        int openBasketSlot = getOpenBasketSlot(player);
+        if (openBasketSlot >= 0) {
+            return false;
+        }
+
+        if (tryInsertIntoBasket(itemStack, player)) {
+            if (!player.level().isClientSide) {
+                player.level().playSound(
+                        null,
+                        player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.PLAYERS,
+                        0.2F,
+                        ((player.level().random.nextFloat() - player.level().random.nextFloat()) * 0.7F + 1.0F) * 2.0F
+                );
+            }
+            if (itemStack.isEmpty() || itemStack.getCount() == 0) {
+                itemEntity.discard();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean tryInsertIntoBasket(ItemStack stack, Player player) {
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack invStack = player.getInventory().getItem(i);
+            if (invStack.getItem() instanceof FruitBasketItem) {
+                long inserted = FruitBasketStorage.add(invStack, stack.getItem(), stack.getCount());
+                int moved = (int) Math.min(inserted, stack.getCount());
+                if (moved > 0) {
+                    stack.shrink(moved);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static int getOpenBasketSlot(Player player) {
+        if (!(player.containerMenu instanceof FruitBasketContainer container)) {
+            return -1;
+        }
+        ItemStack containerStack = container.getBasketStack();
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            if (ItemStack.matches(inventory.getItem(i), containerStack)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void setStoredCount(ItemStack basket, Item item, long amount) {
