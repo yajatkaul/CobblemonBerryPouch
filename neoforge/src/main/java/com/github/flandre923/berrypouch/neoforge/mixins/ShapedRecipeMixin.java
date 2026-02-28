@@ -8,10 +8,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ShapedRecipe.class)
 public interface ShapedRecipeMixin {
-
-    @Accessor("pattern") // 使用 Accessor 注解创建访问器方法
+    @Accessor("pattern")
     ShapedRecipePattern getPatternAccessor();
 
-    @Accessor("result") // 使用 Accessor 注解创建修改器方法 (如果需要设置为 public 可写)
+    @Accessor("result")
     ItemStack getResultAccess();
 }

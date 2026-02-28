@@ -1,5 +1,6 @@
 package com.github.flandre923.berrypouch.neoforge.mixins;
 
+import com.github.flandre923.berrypouch.mixins.shared.EnableAutoFillMixinShared;
 import com.github.flandre923.berrypouch.mobinf.IAutoFillablePlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,9 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 public abstract class EnableAutoFillMixin implements IAutoFillablePlayer {
-
     @Unique
     public boolean berryPouch$autoFillBerryuPouch = true;
+
     @Unique
     public boolean berryPouch$getAutoFillBerryuPouch() {
         return berryPouch$autoFillBerryuPouch;
@@ -29,27 +30,13 @@ public abstract class EnableAutoFillMixin implements IAutoFillablePlayer {
         this.berryPouch$autoFillBerryuPouch = !this.berryPouch$getAutoFillBerryuPouch();
     }
 
-    @Unique
-    public void berryPouch$save(CompoundTag tag){
-        tag.putBoolean("berryPouch_autoFill", this.berryPouch$autoFillBerryuPouch);
-    }
-
-    @Unique
-    public void berryPouch$load(CompoundTag tag) {
-        if (tag.contains("berryPouch_autoFill")) {
-            this.berryPouch$autoFillBerryuPouch = tag.getBoolean("berryPouch_autoFill");
-        }
-    }
-
-    // ====  mixin ====
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void onSave(CompoundTag tag, CallbackInfo ci) {
-        ((EnableAutoFillMixin)(Object)this).berryPouch$save(tag);
+        EnableAutoFillMixinShared.save(tag, berryPouch$autoFillBerryuPouch);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
-        ((EnableAutoFillMixin)(Object)this).berryPouch$load(tag);
+        berryPouch$autoFillBerryuPouch = EnableAutoFillMixinShared.load(tag, berryPouch$autoFillBerryuPouch);
     }
-
 }
