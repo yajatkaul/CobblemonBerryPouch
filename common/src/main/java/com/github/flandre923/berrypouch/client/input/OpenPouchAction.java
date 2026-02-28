@@ -1,7 +1,7 @@
 package com.github.flandre923.berrypouch.client.input;
 
 import com.github.flandre923.berrypouch.item.BerryPouch;
-import com.github.flandre923.berrypouch.network.ModNetworking;
+import com.github.flandre923.berrypouch.network.PacketInvoker;
 import io.wispforest.accessories.api.AccessoriesCapability;
 import io.wispforest.accessories.api.slot.SlotEntryReference;
 import net.minecraft.client.Minecraft;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class OpenPouchAction implements KeyAction {
     @Override
     public void onKeyPressed(Minecraft client) {
-        ModNetworking.sendOpenPouchPacketToServer();
+        PacketInvoker.sendOpenPouch();
     }
 
     @Override

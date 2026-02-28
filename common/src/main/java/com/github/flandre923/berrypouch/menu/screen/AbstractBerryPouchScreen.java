@@ -6,7 +6,7 @@ import com.github.flandre923.berrypouch.helper.RenderHelper;
 import com.github.flandre923.berrypouch.item.BerryPouch;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
 import com.github.flandre923.berrypouch.menu.container.AbstractBerryPouchContainer;
-import com.github.flandre923.berrypouch.network.ModNetworking;
+import com.github.flandre923.berrypouch.network.PacketInvoker;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.wispforest.accessories.api.AccessoriesCapability;
@@ -317,7 +317,7 @@ public abstract  class AbstractBerryPouchScreen <T extends AbstractBerryPouchCon
             Slot clickedSlot = this.hoveredSlot;
             if (clickedSlot != null && clickedSlot.container == menu.getPouchInventory()) {
                 int pouchSlotIndex = clickedSlot.getContainerSlot();
-                ModNetworking.sendToggleMarkSlotPacketToServer(pouchSlotIndex);
+                PacketInvoker.sendToggleMarkSlot(pouchSlotIndex);
                 return true;
             }
         }
