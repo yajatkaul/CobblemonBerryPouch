@@ -2,6 +2,8 @@ package com.github.flandre923.berrypouch.menu.container;
 
 import com.cobblemon.mod.common.item.PokeBallItem;
 import com.github.flandre923.berrypouch.ModRegistries;
+import com.github.flandre923.berrypouch.menu.layout.PokeBallGunLayout;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunHelper;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunInventory;
 import net.minecraft.network.FriendlyByteBuf;
@@ -21,12 +23,7 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
     // 用于同步 selectedIndex 的 DataSlot
     private int selectedIndex;
 
-    // 布局常量
     private static final int GUN_SLOTS = 9;
-    private static final int GUN_START_X = 7;
-    private static final int GUN_START_Y = 15;
-    private static final int PLAYER_INV_START_X = 7;
-    private static final int PLAYER_INV_START_Y = 47;
 
     public PokeBallGunContainer(int containerId, Inventory playerInv, ItemStack gunStack) {
         super(ModRegistries.ModMenuTypes.POKEBALL_GUN_MENU.get(), containerId);
@@ -104,28 +101,20 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
 
 
     private void addGunInventory(){
-        // 添加发射器槽位 (1行8列)
-        for (int col = 0; col < GUN_SLOTS; col++) {
-            addSlot(new PokeBallSlot(gunInventory, col, GUN_START_X + col * 18 + 1, GUN_START_Y + 1));
+        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.GUN_AMMO)) {
+            addSlot(new PokeBallSlot(gunInventory, slot.index(), slot.x(), slot.y()));
         }
     }
 
     private void addPlayerInventory(Inventory playerInv) {
-        // 添加玩家背包 (3行9列)
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInv, col + row * 9 + 9,
-                        PLAYER_INV_START_X + col * 18 + 1,
-                        PLAYER_INV_START_Y + row * 18 + 1));
-            }
+        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_INVENTORY)) {
+            addSlot(new Slot(playerInv, slot.index(), slot.x(), slot.y()));
         }
     }
 
     private void addPlayerHotbar(Inventory playerInv) {
-        for (int col = 0; col < 9; col++) {
-            addSlot(new Slot(playerInv, col,
-                    PLAYER_INV_START_X + col * 18 + 1,
-                    PLAYER_INV_START_Y + 58 + 1));
+        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_HOTBAR)) {
+            addSlot(new Slot(playerInv, slot.index(), slot.x(), slot.y()));
         }
     }
 

@@ -72,12 +72,14 @@ public final class ModRegistries {
 //        public static final RegistrySupplier<BerryPouch> BERRY_POUCH_30;
         public static final RegistrySupplier<BerryPouch> BERRY_POUCH_69;
         public static final RegistrySupplier<PokeBallGun> POKEBALL_GUN ;
+        public static final RegistrySupplier<Item> FRUIT_BASKET;
 
         static {
             //BERRY_POUCH_24 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch_24"), ()->new BerryPouch.java(24));
 //            BERRY_POUCH_30 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch_30"), ()->new BerryPouch(BerryPouchType.MEDIUM));
             BERRY_POUCH_69 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch"), ()->new BerryPouch(BerryPouchType.LARGE));
             POKEBALL_GUN = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"pokeball_gun"),()->new PokeBallGun((new Item.Properties().stacksTo(1))));
+            FRUIT_BASKET = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "fruit_basket"), () -> new Item(new Item.Properties()));
         }
     }
 
@@ -97,6 +99,7 @@ public final class ModRegistries {
 //                        pOutput.accept(Items.BERRY_POUCH_30.get());
                         pOutput.accept(Items.BERRY_POUCH_69.get());
                         pOutput.accept(Items.POKEBALL_GUN.get());
+                        pOutput.accept(Items.FRUIT_BASKET.get());
                     }).build();
         });
     }

@@ -3,7 +3,9 @@ package com.github.flandre923.berrypouch.menu.container;
 import com.github.flandre923.berrypouch.ModRegistries;
 import com.github.flandre923.berrypouch.helper.PouchItemHelper;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
+import com.github.flandre923.berrypouch.menu.layout.LargeBerryPouchLayout;
 import com.github.flandre923.berrypouch.menu.slot.BerryPouchSlot;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
@@ -58,29 +60,11 @@ public class LargeBerryPouchContainer extends  AbstractBerryPouchContainer {
 
     @Override
     protected void addPouchSlots() {
-        // Natural树果：3行10列 (30格)，从(11,16)开始，格子间隔1个像素
-        for (int row = 0; row < 3; ++row) {
-            for (int col = 0; col < 10; ++col) {
-                int slotIndex = col + row * 10;
-                // 每个槽位大小17x17(16+1像素间隔)
-                addBerrySlot(slotIndex, 12 + col * 18,17 + row * 18);
-            }
-        }
-
-        // 混合树果：4行10列 (40格)，从(11,88)开始，格子间隔1个像素  
-        for (int row = 0; row < 4; ++row) {
-            for (int col = 0; col < 10; ++col) {
-                int slotIndex = 30 + col + row * 10;
-                // 每个槽位大小17x17(16+1像素间隔)
-                addBerrySlot(slotIndex, 12 + col * 18,89 + row * 18);
-            }
-        }
-        
-        // Other Baits槽位：8行2列 (16格)，从(210,70)开始，每个格子18x18
-        for (int row = 0; row < 8; ++row) {
-            for (int col = 0; col < 2; ++col) {
-                int slotIndex = 70 + col + row * 2;
-                addOtherBaitsSlot(slotIndex, 210 + col * 18, 17 + row * 18);
+        for (DeclarativeStorageLayout.SlotSpec slot : LargeBerryPouchLayout.STORAGE.slots()) {
+            if (slot.role() == DeclarativeStorageLayout.SlotRole.POUCH_BERRY) {
+                addBerrySlot(slot.index(), slot.x(), slot.y());
+            } else if (slot.role() == DeclarativeStorageLayout.SlotRole.POUCH_OTHER_BAIT) {
+                addOtherBaitsSlot(slot.index(), slot.x(), slot.y());
             }
         }
     }

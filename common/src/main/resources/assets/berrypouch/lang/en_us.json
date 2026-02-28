@@ -20,6 +20,7 @@
   "message.berrypouch.marked_bait_exhausted_switching_none": "Marked bait exhausted! Switched to none.",
   "message.berrypouch.marked_bait_exhausted": "Marked bait exhausted!",
   "item.berrypouch.pokeball_gun": "Pokéball Launcher",
+  "item.berrypouch.fruit_basket": "Fruit Basket",
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "Empty",
   "message.berrypouch.slot_empty": "Empty",

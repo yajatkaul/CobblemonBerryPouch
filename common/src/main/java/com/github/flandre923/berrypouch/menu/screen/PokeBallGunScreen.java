@@ -2,30 +2,25 @@ package com.github.flandre923.berrypouch.menu.screen;
 
 import com.github.flandre923.berrypouch.ModCommon;
 import com.github.flandre923.berrypouch.menu.container.PokeBallGunContainer;
+import com.github.flandre923.berrypouch.menu.layout.PokeBallGunLayout;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeUiRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 
 public class PokeBallGunScreen extends AbstractContainerScreen<PokeBallGunContainer> {
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/pokeball_gun.png");
-    // 纹理实际尺寸
-    private static final int TEXTURE_WIDTH = 223;
-    private static final int TEXTURE_HEIGHT = 129;
-    // 选中框在纹理中的位置
-    private static final int SELECTION_U = 191;
-    private static final int SELECTION_V = 15;
-    private static final int SELECTION_SIZE = 18;
-
+    private static final ResourceLocation STAR_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/star.png");
+    private static final int STAR_SIZE = 20;
 
     public PokeBallGunScreen(PokeBallGunContainer menu, Inventory playerInv, Component title) {
         super(menu, playerInv, title);
-        this.imageWidth = 175;
-        this.imageHeight = 128;
+        this.imageWidth = PokeBallGunLayout.WIDTH;
+        this.imageHeight = PokeBallGunLayout.HEIGHT;
         this.inventoryLabelY = this.imageHeight - 94; // 调整标签位置
     }
 
@@ -33,16 +28,15 @@ public class PokeBallGunScreen extends AbstractContainerScreen<PokeBallGunContai
     public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(gui, mouseX, mouseY, partialTicks);
         super.render(gui, mouseX, mouseY, partialTicks);
+        renderSelectionHighlight(gui);
         this.renderTooltip(gui, mouseX, mouseY);
     }
 
 
     @Override
     protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
-        int x = (width - imageWidth) / 2;
-        int y = (height - imageHeight) / 2;
-        gui.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-        renderSelectionHighlight(gui);
+        DeclarativeUiRenderer.renderLayers(gui, PokeBallGunLayout.STORAGE, leftPos, topPos);
+        DeclarativeUiRenderer.renderSlotFrames(gui, PokeBallGunLayout.STORAGE, leftPos, topPos);
     }
 
 
@@ -50,26 +44,13 @@ public class PokeBallGunScreen extends AbstractContainerScreen<PokeBallGunContai
         int selectedIndex = menu.getSelectedIndex();
         PoseStack poseStack = gui.pose();
 
-        for (Slot slot : menu.slots) {
-            // 只处理发射器的槽位
-            if (slot.container == menu.getGunInventory()) {
-                int slotIndex = slot.getContainerSlot();
-
-                if (slotIndex == selectedIndex) {
-                    poseStack.pushPose();
-                    poseStack.translate(0, 0, 200); // 确保渲染在物品上层
-
-                    int x = this.leftPos + slot.x-1;
-                    int y = this.topPos + slot.y-1;
-
-                    gui.blit(TEXTURE, x, y,
-                            SELECTION_U, SELECTION_V,
-                            SELECTION_SIZE, SELECTION_SIZE,
-                            TEXTURE_WIDTH, TEXTURE_HEIGHT);
-
-                    poseStack.popPose();
-                    break; // 找到了就退出
-                }
+        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.GUN_AMMO)) {
+            if (slot.index() == selectedIndex) {
+                poseStack.pushPose();
+                poseStack.translate(0, 0, 250);
+                gui.blit(STAR_TEXTURE, this.leftPos + slot.x() - 2, this.topPos + slot.y() - 2, 0, 0, STAR_SIZE, STAR_SIZE, STAR_SIZE, STAR_SIZE);
+                poseStack.popPose();
+                break;
             }
         }
     }

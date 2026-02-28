@@ -7,6 +7,8 @@ import com.github.flandre923.berrypouch.item.BerryPouch;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
 import com.github.flandre923.berrypouch.menu.container.AbstractBerryPouchContainer;
 import com.github.flandre923.berrypouch.network.PacketInvoker;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeUiRenderer;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.wispforest.accessories.api.AccessoriesCapability;
@@ -68,9 +70,19 @@ public abstract  class AbstractBerryPouchScreen <T extends AbstractBerryPouchCon
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        renderBackgroundTexture(guiGraphics);
+        DeclarativeStorageLayout layout = getLayout();
+        if (layout != null) {
+            DeclarativeUiRenderer.renderLayers(guiGraphics, layout, leftPos, topPos);
+            DeclarativeUiRenderer.renderSlotFrames(guiGraphics, layout, leftPos, topPos);
+        } else {
+            renderBackgroundTexture(guiGraphics);
+        }
         renderSlotPlaceholders(guiGraphics);
         renderMarkedSlotIndicators(guiGraphics); // <-- 新增调用: 渲染标记指示器
+    }
+
+    protected DeclarativeStorageLayout getLayout() {
+        return null;
     }
 
     protected void renderBackgroundTexture(GuiGraphics guiGraphics) {

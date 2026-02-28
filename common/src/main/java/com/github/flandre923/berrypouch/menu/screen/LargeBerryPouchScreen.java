@@ -3,7 +3,8 @@ package com.github.flandre923.berrypouch.menu.screen;
 import com.github.flandre923.berrypouch.ModCommon;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
 import com.github.flandre923.berrypouch.menu.container.LargeBerryPouchContainer;
-import net.minecraft.client.gui.GuiGraphics;
+import com.github.flandre923.berrypouch.menu.layout.LargeBerryPouchLayout;
+import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,12 +19,8 @@ public class LargeBerryPouchScreen extends AbstractBerryPouchScreen<LargeBerryPo
     }
 
     @Override
-    protected void renderBackgroundTexture(GuiGraphics guiGraphics) {
-        int x = (width - imageWidth) / 2;
-        int y = (height - imageHeight) / 2;
-        
-        // 渲染整个背景纹理 (新图片大小: 256 * 300, 有效区域: 0,0 到 255,257)
-        guiGraphics.blit(TEXTURE, x, y, 0, 0, 255, 257, 256, 300);
+    protected DeclarativeStorageLayout getLayout() {
+        return LargeBerryPouchLayout.STORAGE;
     }
 
     @Override
