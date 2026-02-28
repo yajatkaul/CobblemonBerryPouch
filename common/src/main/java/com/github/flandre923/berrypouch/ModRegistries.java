@@ -19,6 +19,7 @@ package com.github.flandre923.berrypouch;
 
 
 import com.github.flandre923.berrypouch.component.MarkedSlotsComponent;
+import com.github.flandre923.berrypouch.event.FruitBasketInteractionHandler;
 import com.github.flandre923.berrypouch.event.FishingRodEventHandler;
 import com.github.flandre923.berrypouch.item.BerryPouch;
 import com.github.flandre923.berrypouch.item.FruitBasketItem;
@@ -149,6 +150,7 @@ public final class ModRegistries {
             ModRegistries.initialized = true;
             // event
             FishingRodEventHandler.register();
+            FruitBasketInteractionHandler.register();
         }
     }
     private static boolean initialized=false;
