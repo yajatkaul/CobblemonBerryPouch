@@ -64,7 +64,7 @@ public final class ModRegistries {
         public static final Supplier<MenuType<PokeBallGunContainer>> POKEBALL_GUN_MENU = MENU_TYPES.register("pokeball_gun_menu",
                 () -> MenuRegistry.ofExtended(PokeBallGunContainer::fromNetwork)
         );
-        public static final Supplier<MenuType<FruitBasketContainer>> FRUIT_BASKET_MENU = MENU_TYPES.register("fruit_basket_menu",
+        public static final Supplier<MenuType<FruitBasketContainer>> FRUIT_BASKET_MENU = MENU_TYPES.register("apricorn_basket_menu",
                 () -> MenuRegistry.ofExtended(FruitBasketContainer::fromNetwork)
         );
 
@@ -85,7 +85,7 @@ public final class ModRegistries {
 //            BERRY_POUCH_30 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch_30"), ()->new BerryPouch(BerryPouchType.MEDIUM));
             BERRY_POUCH_69 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch"), ()->new BerryPouch(BerryPouchType.LARGE));
             POKEBALL_GUN = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"pokeball_gun"),()->new PokeBallGun((new Item.Properties().stacksTo(1))));
-            FRUIT_BASKET = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "fruit_basket"), () -> new FruitBasketItem(new Item.Properties()));
+            FRUIT_BASKET = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "apricorn_basket"), () -> new FruitBasketItem(new Item.Properties()));
         }
     }
 

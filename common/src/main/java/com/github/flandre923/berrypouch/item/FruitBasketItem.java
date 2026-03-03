@@ -285,7 +285,7 @@ public class FruitBasketItem extends Item {
         MenuRegistry.openExtendedMenu(player, new ExtendedMenuProvider() {
             @Override
             public Component getDisplayName() {
-                return Component.translatable("container.berrypouch.fruit_basket");
+                return Component.translatable("container.berrypouch.apricorn_basket");
             }
 
             @Override

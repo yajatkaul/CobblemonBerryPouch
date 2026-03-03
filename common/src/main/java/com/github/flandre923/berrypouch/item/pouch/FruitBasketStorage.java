@@ -39,6 +39,10 @@ public final class FruitBasketStorage {
         return target - current;
     }
 
+    public static boolean hasItems(ItemStack basket) {
+        return !getItemsTag(basket).isEmpty();
+    }
+
     public static Map<ResourceLocation, Long> getAll(ItemStack basket) {
         CompoundTag itemsTag = getItemsTag(basket);
         Map<ResourceLocation, Long> result = new LinkedHashMap<>();

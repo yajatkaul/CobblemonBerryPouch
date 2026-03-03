@@ -20,10 +20,10 @@
   "message.berrypouch.marked_bait_exhausted_switching_none": "标记诱饵已用尽！已切换至无。",
   "message.berrypouch.marked_bait_exhausted": "标记的诱饵已耗尽！",
   "item.berrypouch.pokeball_gun": "精灵球发射器",
-  "item.berrypouch.fruit_basket": "水果篮",
+  "item.berrypouch.apricorn_basket": "杏子篮",
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "空",
   "message.berrypouch.slot_empty": "空",
   "container.berrypouch.pokeball_gun": "精灵球发射器",
-  "container.berrypouch.fruit_basket": "水果篮"
+  "container.berrypouch.apricorn_basket": "杏子篮"
 }

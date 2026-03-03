@@ -20,10 +20,10 @@
   "message.berrypouch.marked_bait_exhausted_switching_none": "Marked bait exhausted! Switched to none.",
   "message.berrypouch.marked_bait_exhausted": "Marked bait exhausted!",
   "item.berrypouch.pokeball_gun": "Pokéball Launcher",
-  "item.berrypouch.fruit_basket": "Fruit Basket",
+  "item.berrypouch.apricorn_basket": "Apricorn Basket",
   "message.berrypouch.switched_pokeball": "%s",
   "message.berrypouch.gun_slot_empty": "Empty",
   "message.berrypouch.slot_empty": "Empty",
   "container.berrypouch.pokeball_gun": "Pokéball Launcher",
-  "container.berrypouch.fruit_basket": "Fruit Basket"
+  "container.berrypouch.apricorn_basket": "Apricorn Basket"
 }

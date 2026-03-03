@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FruitBasketContainer extends AbstractContainerMenu {
-    private static final int BASKET_SIZE = 36;
+    private static final int BASKET_SIZE = FruitBasketLayout.BASKET_SLOT_COUNT;
     private static final int MAX_EXTRACT_PER_ACTION = 64;
     private static final TagKey<Item> APRICORN_TAG =
             TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("berrypouch", "apricorns"));

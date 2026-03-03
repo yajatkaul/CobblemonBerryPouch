@@ -20,7 +20,7 @@ public class FruitBasketScreen extends AbstractContainerScreen<FruitBasketContai
         this.titleLabelX = 10;
         this.titleLabelY = 6;
         this.inventoryLabelX = 16;
-        this.inventoryLabelY = 92;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
