@@ -4,12 +4,12 @@ import com.github.flandre923.berrypouch.ModCommon;
 import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
 import net.minecraft.resources.ResourceLocation;
 
-public final class FruitBasketLayout {
-    private FruitBasketLayout() {
+public final class ApricornBasketLayout {
+    private ApricornBasketLayout() {
     }
 
     public static final int BASKET_COLUMNS = 7;
-    public static final int BASKET_ROWS = 2;
+    public static final int BASKET_ROWS = 1;
     public static final int BASKET_SLOT_COUNT = BASKET_COLUMNS * BASKET_ROWS;
 
     public static final int WIDTH = 190;

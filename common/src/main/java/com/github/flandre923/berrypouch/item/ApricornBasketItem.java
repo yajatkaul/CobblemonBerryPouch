@@ -1,7 +1,8 @@
 package com.github.flandre923.berrypouch.item;
 
-import com.github.flandre923.berrypouch.item.pouch.FruitBasketStorage;
-import com.github.flandre923.berrypouch.menu.container.FruitBasketContainer;
+import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
+import com.github.flandre923.berrypouch.item.pouch.ApricornSlotMapping;
+import com.github.flandre923.berrypouch.menu.container.ApricornBasketContainer;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
@@ -39,14 +40,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FruitBasketItem extends Item {
+public class ApricornBasketItem extends Item {
     private static final int MAX_BFS_BLOCKS = 192;
     private static final int SEARCH_RADIUS = 2;
     private static final int MAX_HARVESTED_FRUIT_BLOCKS = 64;
     private static final TagKey<Item> APRICORN_TAG =
             TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("berrypouch", "apricorns"));
 
-    public FruitBasketItem(Properties properties) {
+    public ApricornBasketItem(Properties properties) {
         super(properties.stacksTo(1));
     }
 
@@ -77,7 +78,7 @@ public class FruitBasketItem extends Item {
 
     public static boolean handleRightClickBlock(ServerPlayer player, InteractionHand hand, BlockPos origin) {
         ItemStack stack = player.getItemInHand(hand);
-        if (!(stack.getItem() instanceof FruitBasketItem basketItem)) {
+        if (!(stack.getItem() instanceof ApricornBasketItem basketItem)) {
             return false;
         }
 
@@ -100,7 +101,7 @@ public class FruitBasketItem extends Item {
     }
 
     public long getStoredCount(ItemStack basket, Item item) {
-        return FruitBasketStorage.get(basket, item);
+        return ApricornBasketStorage.get(basket, item);
     }
 
     public static boolean onPickupItem(ItemEntity itemEntity, Player player) {
@@ -134,10 +135,13 @@ public class FruitBasketItem extends Item {
     }
 
     private static boolean tryInsertIntoBasket(ItemStack stack, Player player) {
+        if (ApricornSlotMapping.getSlotIndex(stack.getItem()) < 0) {
+            return false;
+        }
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack invStack = player.getInventory().getItem(i);
-            if (invStack.getItem() instanceof FruitBasketItem) {
-                long inserted = FruitBasketStorage.add(invStack, stack.getItem(), stack.getCount());
+            if (invStack.getItem() instanceof ApricornBasketItem) {
+                long inserted = ApricornBasketStorage.add(invStack, stack.getItem(), stack.getCount());
                 int moved = (int) Math.min(inserted, stack.getCount());
                 if (moved > 0) {
                     stack.shrink(moved);
@@ -149,7 +153,7 @@ public class FruitBasketItem extends Item {
     }
 
     private static int getOpenBasketSlot(Player player) {
-        if (!(player.containerMenu instanceof FruitBasketContainer container)) {
+        if (!(player.containerMenu instanceof ApricornBasketContainer container)) {
             return -1;
         }
         ItemStack containerStack = container.getBasketStack();
@@ -163,7 +167,7 @@ public class FruitBasketItem extends Item {
     }
 
     public void setStoredCount(ItemStack basket, Item item, long amount) {
-        FruitBasketStorage.set(basket, item, amount);
+        ApricornBasketStorage.set(basket, item, amount);
     }
 
     private long harvestChainApricorns(ServerLevel level, Player player, ItemStack basketStack, BlockPos start) {
@@ -194,7 +198,10 @@ public class FruitBasketItem extends Item {
                     if (drop.isEmpty() || !isApricornItem(drop)) {
                         continue;
                     }
-                    long inserted = FruitBasketStorage.add(basketStack, drop.getItem(), drop.getCount());
+                    if (ApricornSlotMapping.getSlotIndex(drop.getItem()) < 0) {
+                        continue;
+                    }
+                    long inserted = ApricornBasketStorage.add(basketStack, drop.getItem(), drop.getCount());
                     totalInserted += inserted;
                 }
                 level.setBlock(pos, toUnripeState(state), Block.UPDATE_CLIENTS);
@@ -291,7 +298,7 @@ public class FruitBasketItem extends Item {
             @Override
             public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player p) {
                 ItemStack basket = p.getItemInHand(hand);
-                return new FruitBasketContainer(containerId, inventory, basket, hand == InteractionHand.MAIN_HAND ? 0 : 1);
+                return new ApricornBasketContainer(containerId, inventory, basket, hand == InteractionHand.MAIN_HAND ? 0 : 1);
             }
 
             @Override

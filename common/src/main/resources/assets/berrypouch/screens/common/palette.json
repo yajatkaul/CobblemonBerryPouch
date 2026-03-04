@@ -1,0 +1,13 @@
+{
+  "$schema": "../schema.json",
+  "palette": {
+    "DEFAULT_TEXT_COLOR": "#FF404040",
+    "MUTED_TEXT_COLOR": "#FF7A7A7A",
+    "SELECTION_COLOR": "#FF9CD3FF",
+    "TEXTFIELD_PLACEHOLDER": "#FF9A9A9A",
+    "TEXTFIELD_SELECTION": "#669CD3FF",
+    "TEXTFIELD_ERROR": "#FFFF6666",
+    "TEXTFIELD_TEXT": "#FFE0E0E0",
+    "ERROR": "#FFFF5555"
+  }
+}

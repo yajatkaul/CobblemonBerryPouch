@@ -12,11 +12,12 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public final class FruitBasketStorage {
-    private static final String ROOT_KEY = "FruitBasket";
+public final class ApricornBasketStorage {
+    private static final String ROOT_KEY = "ApricornBasket";
+    private static final String LEGACY_ROOT_KEY = "FruitBasket";
     private static final String ITEMS_KEY = "Items";
 
-    private FruitBasketStorage() {
+    private ApricornBasketStorage() {
     }
 
     public static long get(ItemStack basket, Item item) {
@@ -99,13 +100,18 @@ public final class FruitBasketStorage {
     private static CompoundTag getRootTag(ItemStack basket) {
         CustomData data = basket.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
         CompoundTag fullTag = data.copyTag();
-        return fullTag.getCompound(ROOT_KEY).copy();
+        CompoundTag root = fullTag.getCompound(ROOT_KEY);
+        if (!root.isEmpty()) {
+            return root.copy();
+        }
+        return fullTag.getCompound(LEGACY_ROOT_KEY).copy();
     }
 
     private static void saveRootTag(ItemStack basket, CompoundTag rootTag) {
         CustomData data = basket.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
         CompoundTag fullTag = data.copyTag();
         fullTag.put(ROOT_KEY, rootTag);
+        fullTag.remove(LEGACY_ROOT_KEY);
         basket.set(DataComponents.CUSTOM_DATA, CustomData.of(fullTag));
     }
 

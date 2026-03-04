@@ -1,12 +1,13 @@
 package com.github.flandre923.berrypouch.menu.container;
 
 import com.github.flandre923.berrypouch.ModRegistries;
-import com.github.flandre923.berrypouch.item.FruitBasketItem;
-import com.github.flandre923.berrypouch.item.pouch.FruitBasketStorage;
-import com.github.flandre923.berrypouch.menu.layout.FruitBasketLayout;
-import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
-import net.minecraft.core.registries.Registries;
+import com.github.flandre923.berrypouch.item.ApricornBasketItem;
+import com.github.flandre923.berrypouch.item.pouch.ApricornSlotMapping;
+import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
+import com.github.flandre923.berrypouch.menu.ae.AEBaseMenu;
+import com.github.flandre923.berrypouch.menu.ae.SlotSemantics;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -14,17 +15,19 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FruitBasketContainer extends AbstractContainerMenu {
-    private static final int BASKET_SIZE = FruitBasketLayout.BASKET_SLOT_COUNT;
+public class ApricornBasketContainer extends AEBaseMenu {
+    private static final int BASKET_COLUMNS = ApricornSlotMapping.size();
+    private static final int BASKET_ROWS = 1;
+    private static final int BASKET_SIZE = BASKET_COLUMNS * BASKET_ROWS;
     private static final int MAX_EXTRACT_PER_ACTION = 64;
     private static final TagKey<Item> APRICORN_TAG =
             TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("berrypouch", "apricorns"));
@@ -34,8 +37,8 @@ public class FruitBasketContainer extends AbstractContainerMenu {
     private final SimpleContainer basketDisplay = new SimpleContainer(BASKET_SIZE);
     private final List<Long> displayCounts = new ArrayList<>(BASKET_SIZE);
 
-    public FruitBasketContainer(int containerId, Inventory playerInv, ItemStack basketStack, int openFlag) {
-        super(ModRegistries.ModMenuTypes.FRUIT_BASKET_MENU.get(), containerId);
+    public ApricornBasketContainer(int containerId, Inventory playerInv, ItemStack basketStack, int openFlag) {
+        super(ModRegistries.ModMenuTypes.APRICORN_BASKET_MENU.get(), containerId, playerInv);
         this.basketStack = basketStack;
         this.openFlag = openFlag;
         while (displayCounts.size() < BASKET_SIZE) {
@@ -48,10 +51,17 @@ public class FruitBasketContainer extends AbstractContainerMenu {
         addPlayerHotbar(playerInv);
     }
 
-    public static FruitBasketContainer fromNetwork(int windowId, Inventory inv, FriendlyByteBuf buf) {
+    public static ApricornBasketContainer fromNetwork(int windowId, Inventory inv, FriendlyByteBuf buf) {
         int handFlag = buf.readInt();
-        ItemStack stack = handFlag == 0 ? inv.player.getMainHandItem() : inv.player.getOffhandItem();
-        return new FruitBasketContainer(windowId, inv, stack, handFlag);
+        ItemStack stack;
+        if (handFlag == 0) {
+            stack = inv.player.getItemInHand(InteractionHand.MAIN_HAND);
+        } else if (handFlag == 1) {
+            stack = inv.player.getItemInHand(InteractionHand.OFF_HAND);
+        } else {
+            stack = ItemStack.EMPTY;
+        }
+        return new ApricornBasketContainer(windowId, inv, stack, handFlag);
     }
 
     public long getDisplayCount(int slot) {
@@ -97,7 +107,6 @@ public class FruitBasketContainer extends AbstractContainerMenu {
             if (!toMove.isEmpty()) {
                 insertIntoBasket(toMove, toMove.getCount());
             }
-//            return extracted.copyWithCount(movedCount);
             return ItemStack.EMPTY;
         }
 
@@ -117,7 +126,7 @@ public class FruitBasketContainer extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        if (basketStack.isEmpty() || !(basketStack.getItem() instanceof FruitBasketItem)) {
+        if (basketStack.isEmpty() || !(basketStack.getItem() instanceof ApricornBasketItem)) {
             return false;
         }
         return ItemStack.matches(player.getMainHandItem(), basketStack) || ItemStack.matches(player.getOffhandItem(), basketStack);
@@ -129,28 +138,59 @@ public class FruitBasketContainer extends AbstractContainerMenu {
             displayCounts.set(i, 0L);
         }
 
-        Map<ResourceLocation, Long> items = FruitBasketStorage.getAll(basketStack);
-        int index = 0;
+        Map<ResourceLocation, Long> items = ApricornBasketStorage.getAll(basketStack);
+        long[] fixedCounts = new long[BASKET_SIZE];
+        Item[] markers = new Item[BASKET_SIZE];
+
         for (Map.Entry<ResourceLocation, Long> entry : items.entrySet()) {
-            if (index >= BASKET_SIZE) {
-                break;
-            }
             Item item = BuiltInRegistries.ITEM.get(entry.getKey());
-            if (item == null || item == ItemStack.EMPTY.getItem()) {
+            if (item == null || item == Items.AIR) {
                 continue;
             }
-            basketDisplay.setItem(index, new ItemStack(item));
-            displayCounts.set(index, entry.getValue());
-            index++;
+            int fixedSlot = ApricornSlotMapping.getSlotIndex(entry.getKey());
+            if (fixedSlot < 0 || fixedSlot >= BASKET_SIZE) {
+                continue;
+            }
+
+            long count = Math.max(0L, entry.getValue());
+            if (count <= 0L) {
+                continue;
+            }
+
+            fixedCounts[fixedSlot] = saturatingAdd(fixedCounts[fixedSlot], count);
+            if (markers[fixedSlot] == null) {
+                markers[fixedSlot] = item;
+            }
+        }
+
+        for (int i = 0; i < BASKET_SIZE; i++) {
+            long count = fixedCounts[i];
+            if (count <= 0L) {
+                continue;
+            }
+
+            Item marker = markers[i];
+            if (marker == null || marker == Items.AIR) {
+                marker = ApricornSlotMapping.getExpectedItem(i);
+            }
+            if (marker == null || marker == Items.AIR) {
+                continue;
+            }
+
+            basketDisplay.setItem(i, new ItemStack(marker));
+            displayCounts.set(i, count);
         }
     }
 
     private void addBasketSlots() {
-        for (DeclarativeStorageLayout.SlotSpec slotSpec : FruitBasketLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.POUCH_BERRY)) {
-            addSlot(new Slot(basketDisplay, slotSpec.index(), slotSpec.x(), slotSpec.y()) {
+        for (int slotIndex = 0; slotIndex < BASKET_SIZE; slotIndex++) {
+            addSlot(new Slot(basketDisplay, slotIndex, 0, 0) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
-                    return isApricorn(stack);
+                    if (!isApricorn(stack)) {
+                        return false;
+                    }
+                    return ApricornSlotMapping.matchesSlot(this.index, stack.getItem());
                 }
 
                 @Override
@@ -190,10 +230,10 @@ public class FruitBasketContainer extends AbstractContainerMenu {
                     if (stack.isEmpty() || !isApricorn(stack) || increment <= 0) {
                         return stack;
                     }
-                    int moved = insertIntoBasket(stack, Math.min(increment, stack.getCount()));
-                    return moved > 0 ? stack : stack;
+                    insertIntoBasket(stack, Math.min(increment, stack.getCount()));
+                    return stack;
                 }
-            });
+            }, SlotSemantics.BASKET_STORAGE);
         }
     }
 
@@ -218,13 +258,13 @@ public class FruitBasketContainer extends AbstractContainerMenu {
         }
 
         Item item = marker.getItem();
-        long current = FruitBasketStorage.get(basketStack, item);
+        long current = ApricornBasketStorage.get(basketStack, item);
         if (current <= 0L) {
             return ItemStack.EMPTY;
         }
 
         long next = Math.max(0L, current - take);
-        FruitBasketStorage.set(basketStack, item, next);
+        ApricornBasketStorage.set(basketStack, item, next);
         rebuildDisplay();
 
         return new ItemStack(item, take);
@@ -234,12 +274,16 @@ public class FruitBasketContainer extends AbstractContainerMenu {
         if (!isApricorn(source) || amount <= 0) {
             return 0;
         }
+        if (ApricornSlotMapping.getSlotIndex(source.getItem()) < 0) {
+            return 0;
+        }
+
         int moved = Math.min(amount, source.getCount());
         if (moved <= 0) {
             return 0;
         }
 
-        long inserted = FruitBasketStorage.add(basketStack, source.getItem(), moved);
+        long inserted = ApricornBasketStorage.add(basketStack, source.getItem(), moved);
         int actualMoved = (int) Math.min(inserted, moved);
         if (actualMoved > 0) {
             source.shrink(actualMoved);
@@ -248,15 +292,32 @@ public class FruitBasketContainer extends AbstractContainerMenu {
         return actualMoved;
     }
 
+    public ItemStack getFixedSlotPreview(int slot) {
+        Item expected = ApricornSlotMapping.getExpectedItem(slot);
+        if (expected == null || expected == Items.AIR) {
+            return ItemStack.EMPTY;
+        }
+        return new ItemStack(expected);
+    }
+
+    private static long saturatingAdd(long a, long b) {
+        if (Long.MAX_VALUE - a < b) {
+            return Long.MAX_VALUE;
+        }
+        return a + b;
+    }
+
     private void addPlayerInventory(Inventory playerInv) {
-        for (DeclarativeStorageLayout.SlotSpec slotSpec : FruitBasketLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_INVENTORY)) {
-            addSlot(new Slot(playerInv, slotSpec.index(), slotSpec.x(), slotSpec.y()));
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                addSlot(new Slot(playerInv, col + row * 9 + 9, 0, 0), SlotSemantics.PLAYER_INVENTORY);
+            }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInv) {
-        for (DeclarativeStorageLayout.SlotSpec slotSpec : FruitBasketLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_HOTBAR)) {
-            addSlot(new Slot(playerInv, slotSpec.index(), slotSpec.x(), slotSpec.y()));
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new Slot(playerInv, i, 0, 0), SlotSemantics.PLAYER_HOTBAR);
         }
     }
 }

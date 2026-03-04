@@ -3,7 +3,7 @@ package com.github.flandre923.berrypouch;
 import com.github.flandre923.berrypouch.client.BerryPouchModelHelper;
 import com.github.flandre923.berrypouch.client.hud.BaitRenderHandler;
 import com.github.flandre923.berrypouch.client.input.KeyBindingManager;
-import com.github.flandre923.berrypouch.item.pouch.FruitBasketStorage;
+import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunHelper;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
@@ -17,9 +17,9 @@ public class ModClientCommon {
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "full"),
                 (stack, level, entity, seed) -> BerryPouchModelHelper.shouldUseFullModel(stack) ? 1.0F : 0.0F);
 
-        ItemProperties.register(ModRegistries.Items.FRUIT_BASKET.get(),
+        ItemProperties.register(ModRegistries.Items.APRICORN_BASKET.get(),
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "full"),
-                (stack, level, entity, seed) -> FruitBasketStorage.hasItems(stack) ? 1.0F : 0.0F);
+                (stack, level, entity, seed) -> ApricornBasketStorage.hasItems(stack) ? 1.0F : 0.0F);
 
         ItemProperties.register(ModRegistries.Items.POKEBALL_GUN.get(),
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "poke_ball"),

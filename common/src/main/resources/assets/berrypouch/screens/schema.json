@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://example.com/berrypouch/screen_style",
+  "type": "object",
+  "properties": {
+    "includes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "palette": {
+      "type": "object"
+    },
+    "background": {
+      "type": "object",
+      "properties": {
+        "texture": {
+          "type": "string"
+        },
+        "textureWidth": {
+          "type": "integer"
+        },
+        "textureHeight": {
+          "type": "integer"
+        },
+        "srcRect": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "integer"
+                },
+                "y": {
+                  "type": "integer"
+                },
+                "width": {
+                  "type": "integer"
+                },
+                "height": {
+                  "type": "integer"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "slots": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "left": {
+            "type": "integer"
+          },
+          "top": {
+            "type": "integer"
+          },
+          "right": {
+            "type": "integer"
+          },
+          "bottom": {
+            "type": "integer"
+          },
+          "grid": {
+            "type": "string"
+          },
+          "hidden": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "text": {
+      "type": "object"
+    }
+  }
+}

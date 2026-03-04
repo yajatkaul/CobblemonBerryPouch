@@ -7,7 +7,8 @@
   "mixins": [
     "ItemEntityMixin",
     "ShapedRecipeMixin",
-    "EnableAutoFillMixin"
+    "EnableAutoFillMixin",
+    "SlotAccessor"
   ],
   "client": [
     "client.ItemInHandRendererMixin"

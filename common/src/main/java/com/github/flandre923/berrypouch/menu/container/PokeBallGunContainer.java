@@ -2,36 +2,32 @@ package com.github.flandre923.berrypouch.menu.container;
 
 import com.cobblemon.mod.common.item.PokeBallItem;
 import com.github.flandre923.berrypouch.ModRegistries;
-import com.github.flandre923.berrypouch.menu.layout.PokeBallGunLayout;
-import com.github.flandre923.berrypouch.ui.declarative.DeclarativeStorageLayout;
+import com.github.flandre923.berrypouch.item.PokeBallGun;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunHelper;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunInventory;
+import com.github.flandre923.berrypouch.menu.ae.AEBaseMenu;
+import com.github.flandre923.berrypouch.menu.ae.SlotSemantics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class PokeBallGunContainer extends AbstractContainerMenu {
-    private final ItemStack gunStack;
-    private final PokeBallGunInventory  gunInventory;
-
-    // 用于同步 selectedIndex 的 DataSlot
-    private int selectedIndex;
-
+public class PokeBallGunContainer extends AEBaseMenu {
     private static final int GUN_SLOTS = 9;
 
+    private final ItemStack gunStack;
+    private final PokeBallGunInventory gunInventory;
+    private int selectedIndex;
+
     public PokeBallGunContainer(int containerId, Inventory playerInv, ItemStack gunStack) {
-        super(ModRegistries.ModMenuTypes.POKEBALL_GUN_MENU.get(), containerId);
+        super(ModRegistries.ModMenuTypes.POKEBALL_GUN_MENU.get(), containerId, playerInv);
         this.gunStack = gunStack;
-        this.gunInventory = new PokeBallGunInventory(gunStack,GUN_SLOTS);
+        this.gunInventory = new PokeBallGunInventory(gunStack, GUN_SLOTS);
 
-
-        // 添加 DataSlot 用于同步
         this.addDataSlot(new DataSlot() {
             @Override
             public int get() {
@@ -45,17 +41,34 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
             }
         });
 
-        // 添加发射器槽位 (1行8列)
         addGunInventory();
-        // 添加玩家背包槽位
         addPlayerInventory(playerInv);
         addPlayerHotbar(playerInv);
-
-
     }
 
     public static PokeBallGunContainer fromNetwork(int windowId, Inventory inv, FriendlyByteBuf buf) {
-        return new PokeBallGunContainer(windowId,inv,ItemStack.EMPTY);
+        return new PokeBallGunContainer(windowId, inv, findGunStack(inv));
+    }
+
+    private static ItemStack findGunStack(Inventory inv) {
+        ItemStack main = inv.player.getMainHandItem();
+        if (main.getItem() instanceof PokeBallGun) {
+            return main;
+        }
+
+        ItemStack offhand = inv.player.getOffhandItem();
+        if (offhand.getItem() instanceof PokeBallGun) {
+            return offhand;
+        }
+
+        for (int i = 0; i < inv.getContainerSize(); i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.getItem() instanceof PokeBallGun) {
+                return stack;
+            }
+        }
+
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -68,12 +81,10 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
             result = stackInSlot.copy();
 
             if (index < GUN_SLOTS) {
-                // 从发射器移到背包
                 if (!this.moveItemStackTo(stackInSlot, GUN_SLOTS, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // 从背包移到发射器（只移动捕捉球）
                 if (PokeBallSlot.isPokeBall(stackInSlot)) {
                     if (!this.moveItemStackTo(stackInSlot, 0, GUN_SLOTS, false)) {
                         return ItemStack.EMPTY;
@@ -88,7 +99,7 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
             } else {
                 slot.setChanged();
             }
-            
+
             PokeBallGunHelper.updateSelectedItemId(gunStack);
         }
         return result;
@@ -99,28 +110,27 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
         return !gunStack.isEmpty();
     }
 
-
-    private void addGunInventory(){
-        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.GUN_AMMO)) {
-            addSlot(new PokeBallSlot(gunInventory, slot.index(), slot.x(), slot.y()));
+    private void addGunInventory() {
+        for (int i = 0; i < GUN_SLOTS; i++) {
+            addSlot(new PokeBallSlot(gunInventory, i, 0, 0), SlotSemantics.GUN_AMMO);
         }
     }
 
     private void addPlayerInventory(Inventory playerInv) {
-        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_INVENTORY)) {
-            addSlot(new Slot(playerInv, slot.index(), slot.x(), slot.y()));
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                addSlot(new Slot(playerInv, col + row * 9 + 9, 0, 0), SlotSemantics.PLAYER_INVENTORY);
+            }
         }
     }
 
     private void addPlayerHotbar(Inventory playerInv) {
-        for (DeclarativeStorageLayout.SlotSpec slot : PokeBallGunLayout.STORAGE.slotsByRole(DeclarativeStorageLayout.SlotRole.PLAYER_HOTBAR)) {
-            addSlot(new Slot(playerInv, slot.index(), slot.x(), slot.y()));
+        for (int i = 0; i < 9; ++i) {
+            addSlot(new Slot(playerInv, i, 0, 0), SlotSemantics.PLAYER_HOTBAR);
         }
     }
 
-
     public class PokeBallSlot extends Slot {
-
         public PokeBallSlot(Container container, int slot, int x, int y) {
             super(container, slot, x, y);
         }
@@ -131,21 +141,13 @@ public class PokeBallGunContainer extends AbstractContainerMenu {
         }
 
         public static boolean isPokeBall(ItemStack stack) {
-            if (stack.isEmpty()) return false;
-
-            // 方法1: 检查物品是否属于 Cobblemon 的 PokeBall 类
-            if (stack.getItem() instanceof PokeBallItem) return true;
-
-            // 方法2: 使用 Tag 检查（推荐，更灵活）
-//            return stack.is(ModTags.Items.POKEBALLS);
-
-            // 方法3: 检查物品 ID 前缀
-            // ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
-            // return id.getNamespace().equals("cobblemon") && id.getPath().contains("poke_ball");
-            return false;
+            if (stack.isEmpty()) {
+                return false;
+            }
+            return stack.getItem() instanceof PokeBallItem;
         }
-
     }
+
     public SimpleContainer getGunInventory() {
         return this.gunInventory;
     }
