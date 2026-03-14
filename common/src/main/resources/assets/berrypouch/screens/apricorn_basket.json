@@ -4,47 +4,41 @@
     "common/palette.json"
   ],
   "background": {
-    "texture": "berrypouch:textures/gui/background.png",
-    "textureWidth": 256,
-    "textureHeight": 256,
-    "srcRect": [0, 0, 190, 149]
+    "texture": "berrypouch:textures/gui/apricorn_basket.png",
+    "textureWidth": 175,
+    "textureHeight": 129,
+    "srcRect": [0, 0, 175, 128]
   },
   "images": {
-    "slot_frame": {
-      "texture": "berrypouch:textures/gui/slot.png",
-      "textureWidth": 18,
-      "textureHeight": 18,
-      "srcRect": [0, 0, 18, 18]
-    }
   },
   "slots": {
     "BASKET_STORAGE": {
-      "left": 32,
-      "top": 18,
+      "left": 25,
+      "top": 15,
       "grid": "BREAK_AFTER_7COLS"
     },
     "PLAYER_INVENTORY": {
-      "left": 16,
-      "top": 67,
+      "left": 7,
+      "top": 47,
       "grid": "BREAK_AFTER_9COLS"
     },
     "PLAYER_HOTBAR": {
-      "left": 16,
-      "top": 125,
+      "left": 7,
+      "top": 105,
       "grid": "HORIZONTAL"
     }
   },
   "text": {
     "dialog_title": {
       "position": {
-        "left": 10,
+        "left": 8,
         "top": 6
       }
     },
     "player_inventory": {
       "position": {
-        "left": 16,
-        "top": 55
+        "left": 8,
+        "top": 34
       }
     }
   }

@@ -1,4 +1,4 @@
-package com.github.flandre923.berrypouch.neoforge.mixins;
+package com.github.flandre923.berrypouch.neoforge.mixinsa;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapedRecipe;

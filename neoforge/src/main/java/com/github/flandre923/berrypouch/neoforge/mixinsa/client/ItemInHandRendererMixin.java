@@ -1,4 +1,4 @@
-package com.github.flandre923.berrypouch.neoforge.mixins.client;
+package com.github.flandre923.berrypouch.neoforge.mixinsa.client;
 
 import com.github.flandre923.berrypouch.shared.ItemInHandRendererMixinShared;
 import com.mojang.blaze3d.vertex.PoseStack;

@@ -25,7 +25,7 @@
     ]
   },
   "mixins": [
-    "${mod_id}.mixins.json"
+    "${mod_id}-common.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
@@ -34,5 +34,6 @@
     "cobblemon": ">=${cobblemon_min_ver}",
     "accessories": ">=${accessories_version}",
     "forgeconfigapiport": ">=${fcap_min_ver}"
-  }
+  },
+  "accessWidener": "berrypouch.accesswidener"
 }

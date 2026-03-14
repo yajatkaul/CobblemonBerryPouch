@@ -4,18 +4,12 @@
     "common/palette.json"
   ],
   "background": {
-    "texture": "berrypouch:textures/gui/background.png",
-    "textureWidth": 223,
-    "textureHeight": 129,
+    "texture": "berrypouch:textures/gui/pokeball_gun_2.png",
+    "textureWidth": 176,
+    "textureHeight": 130,
     "srcRect": [0, 0, 175, 128]
   },
   "images": {
-    "slot_frame": {
-      "texture": "berrypouch:textures/gui/slot.png",
-      "textureWidth": 18,
-      "textureHeight": 18,
-      "srcRect": [0, 0, 18, 18]
-    }
   },
   "slots": {
     "GUN_AMMO": {

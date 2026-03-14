@@ -1,4 +1,4 @@
-package com.github.flandre923.berrypouch.neoforge.mixins;
+package com.github.flandre923.berrypouch.neoforge.mixinsa;
 
 import com.github.flandre923.berrypouch.shared.EnableAutoFillMixinShared;
 import com.github.flandre923.berrypouch.mobinf.IAutoFillablePlayer;

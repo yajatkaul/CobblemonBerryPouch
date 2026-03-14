@@ -1,6 +1,7 @@
 package com.github.flandre923.berrypouch.menu.container;
 
 import com.github.flandre923.berrypouch.ModRegistries;
+import com.github.flandre923.berrypouch.helper.TransferPlanner;
 import com.github.flandre923.berrypouch.item.ApricornBasketItem;
 import com.github.flandre923.berrypouch.item.pouch.ApricornSlotMapping;
 import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
@@ -91,22 +92,7 @@ public class ApricornBasketContainer extends AEBaseMenu {
         }
 
         if (index < BASKET_SIZE) {
-            ItemStack extracted = extractFromBasketSlot(index);
-            if (extracted.isEmpty()) {
-                return ItemStack.EMPTY;
-            }
-            ItemStack toMove = extracted.copy();
-            boolean moved = this.moveItemStackTo(toMove, BASKET_SIZE, this.slots.size(), true);
-            int movedCount = extracted.getCount() - toMove.getCount();
-
-            if (!moved || movedCount <= 0) {
-                insertIntoBasket(extracted, extracted.getCount());
-                return ItemStack.EMPTY;
-            }
-
-            if (!toMove.isEmpty()) {
-                insertIntoBasket(toMove, toMove.getCount());
-            }
+            transferFromBasketSlot(index, MAX_EXTRACT_PER_ACTION, createPlayerInventoryTargets());
             return ItemStack.EMPTY;
         }
 
@@ -200,7 +186,7 @@ public class ApricornBasketContainer extends AEBaseMenu {
 
                 @Override
                 public ItemStack remove(int amount) {
-                    return extractFromBasketSlot(this.index);
+                    return extractFromBasketSlot(this.index, amount);
                 }
 
                 @Override
@@ -241,7 +227,7 @@ public class ApricornBasketContainer extends AEBaseMenu {
         return !stack.isEmpty() && stack.is(APRICORN_TAG);
     }
 
-    private ItemStack extractFromBasketSlot(int slot) {
+    private ItemStack extractFromBasketSlot(int slot, int maxExtract) {
         ItemStack marker = basketDisplay.getItem(slot);
         if (marker.isEmpty()) {
             return ItemStack.EMPTY;
@@ -252,7 +238,7 @@ public class ApricornBasketContainer extends AEBaseMenu {
             return ItemStack.EMPTY;
         }
 
-        int take = (int) Math.min(available, MAX_EXTRACT_PER_ACTION);
+        int take = (int) Math.min(available, Math.max(0, maxExtract));
         if (take <= 0) {
             return ItemStack.EMPTY;
         }
@@ -268,6 +254,31 @@ public class ApricornBasketContainer extends AEBaseMenu {
         rebuildDisplay();
 
         return new ItemStack(item, take);
+    }
+
+    private List<TransferPlanner.Target<ItemStack>> createPlayerInventoryTargets() {
+        return List.of(this::moveToPlayerInventory);
+    }
+
+    private boolean transferFromBasketSlot(int slot, int maxExtract, List<TransferPlanner.Target<ItemStack>> targets) {
+        ItemStack extracted = extractFromBasketSlot(slot, maxExtract);
+        if (extracted.isEmpty()) {
+            return false;
+        }
+
+        ItemStack itemType = extracted.copyWithCount(1);
+        int remaining = TransferPlanner.transfer(itemType, extracted.getCount(), targets);
+
+        if (remaining > 0) {
+            insertIntoBasket(itemType.copyWithCount(remaining), remaining);
+        }
+        return remaining < extracted.getCount();
+    }
+
+    private int moveToPlayerInventory(ItemStack itemType, int amount) {
+        ItemStack toMove = itemType.copyWithCount(amount);
+        this.moveItemStackTo(toMove, BASKET_SIZE, this.slots.size(), true);
+        return amount - toMove.getCount();
     }
 
     private int insertIntoBasket(ItemStack source, int amount) {

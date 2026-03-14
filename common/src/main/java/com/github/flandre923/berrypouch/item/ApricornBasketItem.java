@@ -1,10 +1,13 @@
 package com.github.flandre923.berrypouch.item;
 
+import com.cobblemon.mod.common.block.entity.BerryBlockEntity;
 import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
 import com.github.flandre923.berrypouch.item.pouch.ApricornSlotMapping;
 import com.github.flandre923.berrypouch.menu.container.ApricornBasketContainer;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
+import io.wispforest.accessories.api.AccessoriesCapability;
+import io.wispforest.accessories.api.slot.SlotEntryReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -39,6 +42,7 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class ApricornBasketItem extends Item {
     private static final int MAX_BFS_BLOCKS = 192;
@@ -67,12 +71,6 @@ public class ApricornBasketItem extends Item {
         if (player == null) {
             return InteractionResult.PASS;
         }
-        if (player instanceof ServerPlayer serverPlayer) {
-            boolean handled = handleRightClickBlock(serverPlayer, context.getHand(), context.getClickedPos());
-            if (handled) {
-                return InteractionResult.SUCCESS;
-            }
-        }
         return InteractionResult.PASS;
     }
 
@@ -88,13 +86,24 @@ public class ApricornBasketItem extends Item {
         }
 
         ServerLevel level = player.serverLevel();
-        if (!isApricornFruitBlock(level.getBlockState(origin))) {
+        BlockState originState = level.getBlockState(origin);
+
+        if (isBerryFruitBlock(originState)) {
+            long collected = basketItem.harvestChainBerries(level, player, origin);
+            if (collected > 0L) {
+                level.playSound(null, origin, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.PLAYERS, 0.3f, 1.0f);
+                return true;
+            }
+            return false;
+        }
+
+        if (!isApricornFruitBlock(originState)) {
             return false;
         }
 
         long inserted = basketItem.harvestChainApricorns(level, player, stack, origin);
         if (inserted > 0L) {
-            level.playSound(null, origin, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.PLAYERS, 0.8f, 1.0f);
+            level.playSound(null, origin, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.PLAYERS, 0.3f, 1.0f);
             return true;
         }
         return false;
@@ -170,7 +179,36 @@ public class ApricornBasketItem extends Item {
         ApricornBasketStorage.set(basket, item, amount);
     }
 
+    private long harvestChainBerries(ServerLevel level, Player player, BlockPos start) {
+        return harvestChain(
+                level,
+                player,
+                start,
+                ApricornBasketItem::isBerryFruitBlock,
+                (pos, state) -> collectBerryDrops(level, player, pos, state),
+                false
+        );
+    }
+
     private long harvestChainApricorns(ServerLevel level, Player player, ItemStack basketStack, BlockPos start) {
+        return harvestChain(
+                level,
+                player,
+                start,
+                ApricornBasketItem::isApricornFruitBlock,
+                (pos, state) -> collectApricornDrops(level, player, basketStack, pos, state),
+                true
+        );
+    }
+
+    private long harvestChain(
+            ServerLevel level,
+            Player player,
+            BlockPos start,
+            Predicate<BlockState> blockMatcher,
+            HarvestHandler handler,
+            boolean resetToUnripeAfterHarvest
+    ) {
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         Set<BlockPos> queued = new HashSet<>();
         Set<BlockPos> visited = new HashSet<>();
@@ -180,7 +218,7 @@ public class ApricornBasketItem extends Item {
         long totalInserted = 0L;
         int harvestedFruitBlocks = 0;
 
-        while (!queue.isEmpty() && visited.size() < MAX_BFS_BLOCKS && harvestedFruitBlocks < MAX_HARVESTED_FRUIT_BLOCKS) {
+        while (!queue.isEmpty() && visited.size() < MAX_BFS_BLOCKS) {
             BlockPos pos = queue.poll();
             queued.remove(pos);
             if (!visited.add(pos)) {
@@ -188,23 +226,15 @@ public class ApricornBasketItem extends Item {
             }
 
             BlockState state = level.getBlockState(pos);
-            if (!isApricornFruitBlock(state)) {
+            if (!blockMatcher.test(state)) {
                 continue;
             }
 
             if (isRipe(state)) {
-                List<ItemStack> drops = Block.getDrops(state, level, pos, null, player, ItemStack.EMPTY);
-                for (ItemStack drop : drops) {
-                    if (drop.isEmpty() || !isApricornItem(drop)) {
-                        continue;
-                    }
-                    if (ApricornSlotMapping.getSlotIndex(drop.getItem()) < 0) {
-                        continue;
-                    }
-                    long inserted = ApricornBasketStorage.add(basketStack, drop.getItem(), drop.getCount());
-                    totalInserted += inserted;
+                totalInserted += handler.harvest(pos, state);
+                if (resetToUnripeAfterHarvest) {
+                    level.setBlock(pos, toUnripeState(state), Block.UPDATE_CLIENTS);
                 }
-                level.setBlock(pos, toUnripeState(state), Block.UPDATE_CLIENTS);
                 harvestedFruitBlocks++;
 
                 if (harvestedFruitBlocks >= MAX_HARVESTED_FRUIT_BLOCKS) {
@@ -223,7 +253,7 @@ public class ApricornBasketItem extends Item {
                         if (visited.contains(next) || queued.contains(next)) {
                             continue;
                         }
-                        if (!isApricornFruitBlock(level.getBlockState(next))) {
+                        if (!blockMatcher.test(level.getBlockState(next))) {
                             continue;
                         }
 
@@ -237,10 +267,87 @@ public class ApricornBasketItem extends Item {
         return totalInserted;
     }
 
+    private long collectApricornDrops(ServerLevel level, Player player, ItemStack basketStack, BlockPos pos, BlockState state) {
+        long insertedTotal = 0L;
+        List<ItemStack> drops = Block.getDrops(state, level, pos, null, player, ItemStack.EMPTY);
+        for (ItemStack drop : drops) {
+            if (drop.isEmpty() || !isApricornItem(drop)) {
+                continue;
+            }
+            if (ApricornSlotMapping.getSlotIndex(drop.getItem()) < 0) {
+                continue;
+            }
+            long inserted = ApricornBasketStorage.add(basketStack, drop.getItem(), drop.getCount());
+            insertedTotal += inserted;
+        }
+        return insertedTotal;
+    }
+
+    private long collectBerryDrops(ServerLevel level, Player player, BlockPos pos, BlockState state) {
+        long collectedTotal = 0L;
+        List<ItemStack> drops;
+        if (level.getBlockEntity(pos) instanceof BerryBlockEntity berryBlockEntity) {
+            drops = List.copyOf(berryBlockEntity.harvest(level, state, pos, player));
+        } else {
+            drops = Block.getDrops(state, level, pos, null, player, ItemStack.EMPTY);
+        }
+        for (ItemStack drop : drops) {
+            if (drop.isEmpty() || !BerryPouch.isBerry(drop)) {
+                continue;
+            }
+            collectedTotal += routeBerryDrop(player, drop);
+        }
+        return collectedTotal;
+    }
+
+    private long routeBerryDrop(Player player, ItemStack drop) {
+        ItemStack remaining = drop.copy();
+        moveToEquippedPouch(player, remaining);
+
+        if (!remaining.isEmpty()) {
+            player.getInventory().add(remaining);
+        }
+
+        if (!remaining.isEmpty()) {
+            player.drop(remaining, false);
+            remaining.setCount(0);
+        }
+
+        return drop.getCount() - remaining.getCount();
+    }
+
+    private void moveToEquippedPouch(Player player, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        AccessoriesCapability capability = AccessoriesCapability.get(player);
+        if (capability == null) {
+            return;
+        }
+
+        List<SlotEntryReference> equippedPouches = capability.getEquipped(entryStack -> entryStack.getItem() instanceof BerryPouch);
+        for (SlotEntryReference entry : equippedPouches) {
+            if (stack.isEmpty()) {
+                break;
+            }
+            BerryPouch.tryInsertItemStack(entry.stack(), stack, player.level(), player);
+        }
+    }
+
     private static boolean isApricornFruitBlock(BlockState state) {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
         String path = id.getPath();
         return id.getNamespace().equals("cobblemon") && path.contains("apricorn") && !path.contains("leaves");
+    }
+
+    private static boolean isBerryFruitBlock(BlockState state) {
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+        String path = id.getPath();
+        return id.getNamespace().equals("cobblemon")
+                && path.contains("berry")
+                && !path.contains("leaves")
+                && !path.contains("apricorn");
     }
 
     private static boolean isApricornItem(ItemStack stack) {
@@ -274,7 +381,13 @@ public class ApricornBasketItem extends Item {
             }
             if (property instanceof IntegerProperty intProperty && isRipeIntegerProperty(name)) {
                 int min = intProperty.getPossibleValues().stream().min(Integer::compareTo).orElse(0);
-                result = result.setValue(intProperty, min);
+                if (isGrowthStageIntegerProperty(name)) {
+                    int max = intProperty.getPossibleValues().stream().max(Integer::compareTo).orElse(min);
+                    int postHarvest = Math.max(min, max - 1);
+                    result = result.setValue(intProperty, postHarvest);
+                } else {
+                    result = result.setValue(intProperty, min);
+                }
             }
         }
         return result;
@@ -286,6 +399,10 @@ public class ApricornBasketItem extends Item {
 
     private static boolean isRipeIntegerProperty(String name) {
         return name.equals("age") || name.equals("fruit") || name.equals("stage") || name.equals("berries");
+    }
+
+    private static boolean isGrowthStageIntegerProperty(String name) {
+        return name.equals("age") || name.equals("stage");
     }
 
     private static void openGui(ServerPlayer player, InteractionHand hand) {
@@ -306,5 +423,10 @@ public class ApricornBasketItem extends Item {
                 buf.writeInt(hand == InteractionHand.MAIN_HAND ? 0 : 1);
             }
         });
+    }
+
+    @FunctionalInterface
+    private interface HarvestHandler {
+        long harvest(BlockPos pos, BlockState state);
     }
 }

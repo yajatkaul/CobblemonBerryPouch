@@ -10,12 +10,6 @@
     "srcRect": [0, 0, 255, 257]
   },
   "images": {
-    "slot_frame": {
-      "texture": "berrypouch:textures/gui/slot.png",
-      "textureWidth": 18,
-      "textureHeight": 18,
-      "srcRect": [0, 0, 18, 18]
-    }
   },
   "slots": {
     "POUCH_NATURAL_BERRY": {

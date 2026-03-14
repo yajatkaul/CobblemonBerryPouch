@@ -104,9 +104,9 @@ public abstract class AEBaseScreen<T extends AEBaseMenu> extends AbstractContain
     }
 
     private static void setSlotPos(Slot slot, int x, int y) {
-        SlotAccessor accessor = (SlotAccessor) slot;
-        accessor.berrypouch$setX(x);
-        accessor.berrypouch$setY(y);
+        var access = (SlotAccessor) slot;
+        access.berrypouch$setX(x);
+        access.berrypouch$setY(y);
     }
 
     protected Rect2i getBounds(boolean absolute) {
