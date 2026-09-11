@@ -5,37 +5,41 @@ import com.github.flandre923.berrypouch.item.BerryPouch;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchInventory;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchManager;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
+import com.github.flandre923.berrypouch.menu.ae.AEBaseMenu;
+import com.github.flandre923.berrypouch.menu.ae.SlotSemantics;
 import com.github.flandre923.berrypouch.menu.slot.SlotLocked;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class AbstractBerryPouchContainer extends AbstractContainerMenu {
+public abstract class AbstractBerryPouchContainer extends AEBaseMenu {
     protected final ItemStack pouchStack;
     protected final BerryPouchInventory pouchInventory;
     protected final BerryPouchType pouchType;
-    protected final int openFlag; // 标识树果袋打开来源
+    protected final int openFlag;
+
     public AbstractBerryPouchContainer(
             MenuType<?> type, int windowId, Inventory playerInv,
-            ItemStack pouchStack, BerryPouchType pouchType,int openFlag
+            ItemStack pouchStack, BerryPouchType pouchType, int openFlag
     ) {
-        super(type, windowId);
+        super(type, windowId, playerInv);
         this.pouchStack = pouchStack;
         this.pouchType = pouchType;
         this.pouchInventory = BerryPouchManager.getInventory(pouchStack, playerInv.player.level());
         this.openFlag = openFlag;
 
         addPouchSlots();
-        addPlayerSlots(playerInv,pouchStack);
+        addPlayerSlots(playerInv, pouchStack);
     }
+
     protected abstract void addPouchSlots();
-    protected void addPlayerSlots(Inventory playerInv,ItemStack bag) {
+
+    protected void addPlayerSlots(Inventory playerInv, ItemStack bag) {
         addInventorySlots(playerInv);
-        addHotbarSlots(playerInv,bag);
+        addHotbarSlots(playerInv, bag);
     }
 
     @Override
@@ -46,21 +50,20 @@ public abstract class AbstractBerryPouchContainer extends AbstractContainerMenu 
     private void addInventorySlots(Inventory playerInv) {
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                addSlot(new Slot(playerInv, col + row * 9 + 9, 48 + col * 18, 176 + row * 18));
+                addSlot(new Slot(playerInv, col + row * 9 + 9, 0, 0), SlotSemantics.PLAYER_INVENTORY);
             }
         }
     }
 
     private void addHotbarSlots(Inventory playerInv, ItemStack bag) {
         for (int i = 0; i < 9; ++i) {
-            if (bag.getItem() instanceof BerryPouch && playerInv.getItem(i) == bag ) {
-                addSlot(new SlotLocked(playerInv, i, 48 + i * 18, 234));
+            if (bag.getItem() instanceof BerryPouch && playerInv.getItem(i) == bag) {
+                addSlot(new SlotLocked(playerInv, i, 0, 0), SlotSemantics.PLAYER_HOTBAR);
             } else {
-                addSlot(new Slot(playerInv, i, 48 + i * 18, 234));
+                addSlot(new Slot(playerInv, i, 0, 0), SlotSemantics.PLAYER_HOTBAR);
             }
         }
     }
-
 
     public Container getPouchInventory() {
         return this.pouchInventory;
@@ -77,5 +80,4 @@ public abstract class AbstractBerryPouchContainer extends AbstractContainerMenu 
     public int getOpenFlag() {
         return openFlag;
     }
-
 }

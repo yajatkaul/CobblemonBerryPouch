@@ -3,8 +3,7 @@ package com.github.flandre923.berrypouch.client.input;
 import com.github.flandre923.berrypouch.event.FishingRodEventHandler;
 import com.github.flandre923.berrypouch.item.BerryPouch;
 import com.github.flandre923.berrypouch.item.PokeBallGun;
-import com.github.flandre923.berrypouch.network.CycleBaitPacket;
-import dev.architectury.networking.NetworkManager;
+import com.github.flandre923.berrypouch.network.PacketInvoker;
 import io.wispforest.accessories.api.AccessoriesCapability;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -25,9 +24,7 @@ public class CycleBaitAction implements KeyAction{
 
     @Override
     public void onKeyPressed(Minecraft client) {
-        NetworkManager.sendToServer(
-                new CycleBaitPacket(isMainHandValid(client.player), isLeftCycle)
-        );
+        PacketInvoker.sendCycleBait(isMainHandValid(client.player), isLeftCycle);
     }
 
     @Override

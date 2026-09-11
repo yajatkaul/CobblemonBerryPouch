@@ -1,78 +1,62 @@
 package com.github.flandre923.berrypouch.menu.screen;
 
 import com.github.flandre923.berrypouch.ModCommon;
+import com.github.flandre923.berrypouch.client.gui.style.StyleManager;
+import com.github.flandre923.berrypouch.menu.ae.SlotSemantics;
 import com.github.flandre923.berrypouch.menu.container.PokeBallGunContainer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
-public class PokeBallGunScreen extends AbstractContainerScreen<PokeBallGunContainer> {
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/pokeball_gun.png");
-    // 纹理实际尺寸
-    private static final int TEXTURE_WIDTH = 223;
-    private static final int TEXTURE_HEIGHT = 129;
-    // 选中框在纹理中的位置
-    private static final int SELECTION_U = 191;
-    private static final int SELECTION_V = 15;
-    private static final int SELECTION_SIZE = 18;
-
+public class PokeBallGunScreen extends AEBaseScreen<PokeBallGunContainer> {
+    private static final ResourceLocation STAR_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "textures/gui/star.png");
+    private static final int STAR_SIZE = 20;
 
     public PokeBallGunScreen(PokeBallGunContainer menu, Inventory playerInv, Component title) {
-        super(menu, playerInv, title);
-        this.imageWidth = 175;
-        this.imageHeight = 128;
-        this.inventoryLabelY = this.imageHeight - 94; // 调整标签位置
+        super(menu, playerInv, title, StyleManager.loadStyleDoc("/screens/pokeball_gun.json"));
+        setTextContent(TEXT_ID_DIALOG_TITLE, title);
+        setTextContent(TEXT_ID_PLAYER_INVENTORY, this.playerInventoryTitle);
     }
 
     @Override
-    public void render(GuiGraphics gui, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(gui, mouseX, mouseY, partialTicks);
-        super.render(gui, mouseX, mouseY, partialTicks);
-        this.renderTooltip(gui, mouseX, mouseY);
-    }
-
-
-    @Override
-    protected void renderBg(GuiGraphics gui, float partialTick, int mouseX, int mouseY) {
-        int x = (width - imageWidth) / 2;
-        int y = (height - imageHeight) / 2;
-        gui.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, TEXTURE_WIDTH, TEXTURE_HEIGHT);
-        renderSelectionHighlight(gui);
-    }
-
-
-    private void renderSelectionHighlight(GuiGraphics gui) {
-        int selectedIndex = menu.getSelectedIndex();
-        PoseStack poseStack = gui.pose();
-
-        for (Slot slot : menu.slots) {
-            // 只处理发射器的槽位
-            if (slot.container == menu.getGunInventory()) {
-                int slotIndex = slot.getContainerSlot();
-
-                if (slotIndex == selectedIndex) {
-                    poseStack.pushPose();
-                    poseStack.translate(0, 0, 200); // 确保渲染在物品上层
-
-                    int x = this.leftPos + slot.x-1;
-                    int y = this.topPos + slot.y-1;
-
-                    gui.blit(TEXTURE, x, y,
-                            SELECTION_U, SELECTION_V,
-                            SELECTION_SIZE, SELECTION_SIZE,
-                            TEXTURE_WIDTH, TEXTURE_HEIGHT);
-
-                    poseStack.popPose();
-                    break; // 找到了就退出
-                }
-            }
+    public void drawBG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY, float partialTick) {
+        super.drawBG(guiGraphics, offsetX, offsetY, mouseX, mouseY, partialTick);
+        try {
+            renderSlotFrames(guiGraphics, style.getImage("slot_frame"));
+        } catch (IllegalStateException ignored) {
         }
     }
 
+    @Override
+    public void drawFG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY) {
+        renderSelectionHighlight(guiGraphics, offsetX, offsetY);
+    }
 
+    private void renderSelectionHighlight(GuiGraphics guiGraphics, int offsetX, int offsetY) {
+        int selectedIndex = menu.getSelectedIndex();
+        PoseStack poseStack = guiGraphics.pose();
+
+        for (Slot slot : menu.getSlots(SlotSemantics.GUN_AMMO)) {
+            if (slot.getContainerSlot() == selectedIndex) {
+                poseStack.pushPose();
+                poseStack.translate(0, 0, 250);
+                guiGraphics.blit(
+                        STAR_TEXTURE,
+                        offsetX + slot.x - 2,
+                        offsetY + slot.y - 2,
+                        0,
+                        0,
+                        STAR_SIZE,
+                        STAR_SIZE,
+                        STAR_SIZE,
+                        STAR_SIZE);
+                poseStack.popPose();
+                break;
+            }
+        }
+    }
 }

@@ -27,5 +27,9 @@ run/
 .env
 libs
 *.log
+.gradle-user
+.codex_tmp
+repomix-output-AppliedEnergistics-Applied-Energistics-2.md
+todo.md
 
 .opencode

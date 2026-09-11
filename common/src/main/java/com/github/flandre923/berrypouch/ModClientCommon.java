@@ -1,16 +1,14 @@
 package com.github.flandre923.berrypouch;
 
-import com.cobblemon.mod.common.item.CobblemonItem;
 import com.github.flandre923.berrypouch.client.BerryPouchModelHelper;
 import com.github.flandre923.berrypouch.client.hud.BaitRenderHandler;
 import com.github.flandre923.berrypouch.client.input.KeyBindingManager;
+import com.github.flandre923.berrypouch.item.pouch.ApricornBasketStorage;
 import com.github.flandre923.berrypouch.item.pouch.PokeBallGunHelper;
 import dev.architectury.event.events.client.ClientGuiEvent;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
 import dev.architectury.event.events.client.ClientTickEvent;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModClientCommon {
 
@@ -19,6 +17,9 @@ public class ModClientCommon {
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "full"),
                 (stack, level, entity, seed) -> BerryPouchModelHelper.shouldUseFullModel(stack) ? 1.0F : 0.0F);
 
+        ItemProperties.register(ModRegistries.Items.APRICORN_BASKET.get(),
+                ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "full"),
+                (stack, level, entity, seed) -> ApricornBasketStorage.hasItems(stack) ? 1.0F : 0.0F);
 
         ItemProperties.register(ModRegistries.Items.POKEBALL_GUN.get(),
                 ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "poke_ball"),

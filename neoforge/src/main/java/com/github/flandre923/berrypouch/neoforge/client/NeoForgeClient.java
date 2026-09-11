@@ -22,6 +22,7 @@ import com.github.flandre923.berrypouch.ModCommon;
 
 import com.github.flandre923.berrypouch.ModRegistries;
 import com.github.flandre923.berrypouch.client.input.KeyBindingManager;
+import com.github.flandre923.berrypouch.menu.screen.ApricornBasketScreen;
 import com.github.flandre923.berrypouch.menu.container.PokeBallGunContainer;
 import com.github.flandre923.berrypouch.menu.screen.LargeBerryPouchScreen;
 import com.github.flandre923.berrypouch.menu.screen.PokeBallGunScreen;
@@ -44,6 +45,7 @@ public class NeoForgeClient {
 //        event.register(ModRegistries.ModMenuTypes.BERRY_POUCH_CONTAINER_30.get(), MediumBerryPouchScreen::new);
         event.register(ModRegistries.ModMenuTypes.POKEBALL_GUN_MENU.get(), PokeBallGunScreen::new);
         event.register(ModRegistries.ModMenuTypes.BERRY_POUCH_CONTAINER_69.get(), LargeBerryPouchScreen::new);
+        event.register(ModRegistries.ModMenuTypes.APRICORN_BASKET_MENU.get(), ApricornBasketScreen::new);
     }
 
 

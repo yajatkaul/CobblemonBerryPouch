@@ -15,8 +15,6 @@ import net.minecraft.world.level.Level;
 import java.util.*;
 
 public class BerryPouchManager {
-
-
     private static AbstractContainerMenu createMenu(BerryPouchType type, int syncId, Inventory inv, ItemStack pouchStack,int openFlag) {
         switch (type) {
             case LARGE:

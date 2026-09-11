@@ -19,11 +19,14 @@ package com.github.flandre923.berrypouch;
 
 
 import com.github.flandre923.berrypouch.component.MarkedSlotsComponent;
+import com.github.flandre923.berrypouch.event.ApricornBasketInteractionHandler;
 import com.github.flandre923.berrypouch.event.FishingRodEventHandler;
 import com.github.flandre923.berrypouch.item.BerryPouch;
+import com.github.flandre923.berrypouch.item.ApricornBasketItem;
 import com.github.flandre923.berrypouch.item.PokeBallGun;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchManager;
 import com.github.flandre923.berrypouch.item.pouch.BerryPouchType;
+import com.github.flandre923.berrypouch.menu.container.ApricornBasketContainer;
 import com.github.flandre923.berrypouch.menu.container.LargeBerryPouchContainer;
 import com.github.flandre923.berrypouch.menu.container.PokeBallGunContainer;
 import com.github.flandre923.berrypouch.recipe.BerryPouchUpgradeRecipe;
@@ -61,6 +64,9 @@ public final class ModRegistries {
         public static final Supplier<MenuType<PokeBallGunContainer>> POKEBALL_GUN_MENU = MENU_TYPES.register("pokeball_gun_menu",
                 () -> MenuRegistry.ofExtended(PokeBallGunContainer::fromNetwork)
         );
+        public static final Supplier<MenuType<ApricornBasketContainer>> APRICORN_BASKET_MENU = MENU_TYPES.register("apricorn_basket_menu",
+                () -> MenuRegistry.ofExtended(ApricornBasketContainer::fromNetwork)
+        );
 
 
 
@@ -72,12 +78,14 @@ public final class ModRegistries {
 //        public static final RegistrySupplier<BerryPouch> BERRY_POUCH_30;
         public static final RegistrySupplier<BerryPouch> BERRY_POUCH_69;
         public static final RegistrySupplier<PokeBallGun> POKEBALL_GUN ;
+        public static final RegistrySupplier<Item> APRICORN_BASKET;
 
         static {
             //BERRY_POUCH_24 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch_24"), ()->new BerryPouch.java(24));
 //            BERRY_POUCH_30 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch_30"), ()->new BerryPouch(BerryPouchType.MEDIUM));
             BERRY_POUCH_69 = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"berry_pouch"), ()->new BerryPouch(BerryPouchType.LARGE));
             POKEBALL_GUN = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID,"pokeball_gun"),()->new PokeBallGun((new Item.Properties().stacksTo(1))));
+            APRICORN_BASKET = REGISTRY.register(ResourceLocation.fromNamespaceAndPath(ModCommon.MOD_ID, "apricorn_basket"), () -> new ApricornBasketItem(new Item.Properties()));
         }
     }
 
@@ -97,6 +105,7 @@ public final class ModRegistries {
 //                        pOutput.accept(Items.BERRY_POUCH_30.get());
                         pOutput.accept(Items.BERRY_POUCH_69.get());
                         pOutput.accept(Items.POKEBALL_GUN.get());
+                        pOutput.accept(Items.APRICORN_BASKET.get());
                     }).build();
         });
     }
@@ -141,6 +150,7 @@ public final class ModRegistries {
             ModRegistries.initialized = true;
             // event
             FishingRodEventHandler.register();
+            ApricornBasketInteractionHandler.register();
         }
     }
     private static boolean initialized=false;

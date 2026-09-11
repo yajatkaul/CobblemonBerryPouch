@@ -1,7 +1,6 @@
 package com.github.flandre923.berrypouch.client.input;
 
-import com.github.flandre923.berrypouch.network.ToggleAutoBerryPayload;
-import dev.architectury.networking.NetworkManager;
+import com.github.flandre923.berrypouch.network.PacketInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
@@ -13,6 +12,6 @@ public class ToggleAutoBerryAction implements KeyAction {
 
     @Override
     public void onKeyPressed(Minecraft mc) {
-        NetworkManager.sendToServer(new ToggleAutoBerryPayload());
+        PacketInvoker.sendToggleAutoBerry();
     }
 }
