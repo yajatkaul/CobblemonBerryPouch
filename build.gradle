@@ -174,7 +174,6 @@ publishMods {
         requires("cobblemon")
         requires("accessories")
         requires("architectury-api")
-        requires("forge-config-api-port")
     }
     modrinth("modrinthFabric") {
         from mrOptions
@@ -184,7 +183,6 @@ publishMods {
         requires("cobblemon")
         requires("accessories")
         requires("architectury-api")
-        requires("forge-config-api-port")
     }
 
     curseforge("curseforgeNeoForge") {
