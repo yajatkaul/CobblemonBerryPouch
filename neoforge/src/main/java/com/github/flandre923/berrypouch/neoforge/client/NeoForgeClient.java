@@ -36,7 +36,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 import java.security.Key;
 
-@EventBusSubscriber(modid = ModCommon.MOD_ID,bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ModCommon.MOD_ID, value = Dist.CLIENT)
 public class NeoForgeClient {
     @SubscribeEvent
     public static  void registerScreen(RegisterMenuScreensEvent event)

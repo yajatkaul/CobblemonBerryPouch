@@ -2,6 +2,8 @@ plugins {
     id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'co.uzzu.dotenv.gradle'
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 architectury {
@@ -33,7 +35,14 @@ subprojects {
         // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
         // See https://docs.gradle.org/current/userguide/declaring_repositories.html
         // for more information about repositories.
-        maven { url = "https://maven.impactdev.net/repository/development/" }
+        maven {
+            name = "cobblemonSnapshots"
+            url = uri("https://artefacts.cobblemon.com/snapshots")
+        }
+        maven {
+            name = "cobblemon"
+            url = uri("https://artefacts.cobblemon.com/releases")
+        }
 
         maven {
             name = 'CurseForge'
@@ -136,5 +145,84 @@ subprojects {
             // The repositories here will be used for publishing your artifact, not for
             // retrieving dependencies.
         }
+    }
+}
+
+Properties dotenv = new Properties()
+File envFile = file(".env")
+
+if (envFile.exists()) {
+    envFile.withInputStream { stream ->
+        dotenv.load(stream)
+    }
+}
+
+def resolveEnv = { String key ->
+    String value = dotenv.getProperty(key)
+    return value != null ? value : System.getenv(key)
+}
+
+publishMods {
+    changelog = file("CHANGELOG.md").text
+    type = BETA
+
+    String modrinthToken = resolveEnv("MODRINTH_TOKEN")
+    String curseforgeToken = resolveEnv("CURSEFORGE_TOKEN")
+
+    dryRun = modrinthToken == null || curseforgeToken == null
+
+    def cfOptions = curseforgeOptions {
+        accessToken = curseforgeToken
+        projectId = project.curseforge_id
+        clientRequired = true
+        serverRequired = true
+        minecraftVersions.add("1.21.1")
+        projectSlug = "berry-pouch"
+    }
+
+    def mrOptions = modrinthOptions {
+        accessToken = modrinthToken
+        projectId = project.modrinth_id
+        minecraftVersions.add("1.21.1")
+    }
+
+    curseforge("curseforgeFabric") {
+        from cfOptions
+        file project(":fabric")
+        modLoaders.add("fabric")
+        requires("fabric-api")
+        requires("cobblemon")
+        requires("accessories")
+        requires("architectury-api")
+        requires("owo-lib")
+    }
+    modrinth("modrinthFabric") {
+        from mrOptions
+        file project(":fabric")
+        modLoaders.add("fabric")
+        requires("fabric-api")
+        requires("cobblemon")
+        requires("accessories")
+        requires("architectury-api")
+        requires("owo-lib")
+    }
+
+    curseforge("curseforgeNeoForge") {
+        from cfOptions
+        file project(":neoforge")
+        modLoaders.add("neoforge")
+        requires("cobblemon")
+        requires("accessories")
+        requires("architectury-api")
+        requires("owo-lib")
+    }
+    modrinth("modrinthNeoForge") {
+        from mrOptions
+        file project(":neoforge")
+        modLoaders.add("neoforge")
+        requires("cobblemon")
+        requires("accessories")
+        requires("architectury-api")
+        requires("owo-lib")
     }
 }
